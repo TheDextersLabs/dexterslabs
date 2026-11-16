@@ -1,0 +1,83 @@
+<!-- ... existing code ... -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dexter's Labs // RV Workstation CAD & Fabrication Blueprint</title>
+    <meta name="description" content="Interactive CAD fabrication schematic, woodworking cut-list, and 5V/12V Mean Well DC power distribution blueprint by Dexter's Labs.">
+    <script src="https://cdn.tailwindcss.com"></script>
+<!-- ... existing code ... -->
+    <!-- Top Header / Title Block Bar -->
+    <header class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex flex-wrap items-center justify-between gap-4 no-print">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded bg-teal-500/10 border border-teal-400/40 flex items-center justify-center text-teal-300 font-bold mono text-sm">
+                DL
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-base font-bold tracking-wide text-slate-100 uppercase">Dexter's Labs</h1>
+                    <span class="text-[11px] mono px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/30">dexterslabs.net</span>
+                </div>
+                <p class="text-xs text-slate-400 mono">PROJECT: RV CORNER WORKSTATION // DWG NO: DL-RV-2026-A</p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+            <button onclick="setView('orthographic')" id="btn-ortho" class="px-3 py-1.5 text-xs mono rounded bg-teal-500/20 text-teal-300 border border-teal-400/50 transition">
+                [1] ORTHOGRAPHIC VIEWS
+            </button>
+            <button onclick="setView('metalwork')" id="btn-metal" class="px-3 py-1.5 text-xs mono rounded bg-slate-800 text-slate-400 border border-slate-700 hover:text-slate-200 transition">
+                [2] METAL PLATE DETAIL
+            </button>
+            <button onclick="setView('electrical')" id="btn-elec" class="px-3 py-1.5 text-xs mono rounded bg-slate-800 text-slate-400 border border-slate-700 hover:text-slate-200 transition">
+                [3] UNDER-DESK ROUTING
+            </button>
+            <button onclick="window.print()" class="ml-1 px-3 py-1.5 text-xs mono rounded bg-amber-500/20 text-amber-300 border border-amber-400/40 hover:bg-amber-500/30 transition">
+                PRINT / PDF
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+<!-- ... existing code ... -->
+                <div>
+                    <div class="flex justify-between text-xs mono mb-1">
+                        <span class="text-slate-400">Wheel-Well Box (36"W × H)</span>
+                        <span id="val-boxh" class="text-teal-300 font-bold">9.0"</span>
+                    </div>
+                    <input type="range" id="in-boxh" min="6" max="14" step="0.5" value="9" class="w-full" oninput="updateDrawing()">
+                </div>
+            </div>
+
+            <!-- Layer Toggles -->
+<!-- ... existing code ... -->
+                    <!-- Engineering Title Block (Bottom Right of Sheet) -->
+                    <g transform="translate(670, 615)">
+                        <rect x="0" y="0" width="315" height="90" fill="#071324" stroke="#64ffda" stroke-width="1.2"/>
+                        <line x1="0" y1="24" x2="315" y2="24" stroke="#64ffda" stroke-width="0.8"/>
+                        <line x1="0" y1="56" x2="315" y2="56" stroke="#64ffda" stroke-width="0.8"/>
+                        <line x1="185" y1="24" x2="185" y2="90" stroke="#64ffda" stroke-width="0.8"/>
+                        
+                        <text x="10" y="16" fill="#64ffda" font-family="JetBrains Mono" font-size="11" font-weight="bold">DEXTERSLABS.NET // RV SPEC</text>
+                        <text x="10" y="38" fill="#94a3b8" font-family="JetBrains Mono" font-size="9">TOP: 58"×24" // SUB: (2) 12"×58"×1"</text>
+                        <text x="10" y="50" fill="#94a3b8" font-family="JetBrains Mono" font-size="9">POSTS: Ø3" RV PEDESTAL + 6" CUPS</text>
+                        
+                        <text x="193" y="38" fill="#ffb703" font-family="JetBrains Mono" font-size="9">UNITS: <tspan id="tb-units">INCHES</tspan></text>
+                        <text x="193" y="50" fill="#94a3b8" font-family="JetBrains Mono" font-size="9">PSU: MW LRS 5V & 12V</text>
+
+                        <text x="10" y="71" fill="#e2e8f0" font-family="JetBrains Mono" font-size="9">LOC: RIGHT TOYHAULER PARTITION WALL</text>
+                        <text x="10" y="83" fill="#64ffda" font-family="JetBrains Mono" font-size="9">REV: 03 (SKITCH MEASURED + DC PANELS)</text>
+                        <text x="193" y="76" fill="#e2e8f0" font-family="JetBrains Mono" font-size="11" font-weight="bold" id="tb-sheet">SHEET 1 OF 3</text>
+                    </g>
+                </svg>
+            </div>
+        </main>
+    </div>
+
+    <!-- Site Footer -->
+    <footer class="bg-slate-950 border-t border-slate-800 px-6 py-2.5 flex flex-wrap items-center justify-between text-[11px] mono text-slate-400 no-print">
+        <div>© 2026 <span class="text-teal-300 font-semibold">dexterslabs.net</span> — Custom Fabrication, Electronics & RV Engineering</div>
+        <div>HOSTED VIA GITHUB PAGES + CLOUDFLARE EDGE</div>
+    </footer>
+
+    <script>
+<!-- ... existing code ... -->
