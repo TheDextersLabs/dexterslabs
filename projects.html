@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dexter's Labs // Projects & RV Workstation CAD Blueprint</title>
+    <meta name="description" content="Interactive CAD fabrication schematic, woodworking cut-list, and 5V/12V Mean Well DC power distribution blueprint by Dexter's Labs.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;600;700&display=swap');
+
+        :root {
+            --bg-blueprint: #0a192f;
+            --grid-line: rgba(100, 255, 218, 0.08);
+            --grid-major: rgba(100, 255, 218, 0.18);
+            --cyan-glow: #64ffda;
+            --amber-dim: #ffb703;
+            --wood-stroke: #e2b887;
+            --metal-stroke: #94a3b8;
+        }
+
+        body {
+            background-color: #06101f;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .blueprint-canvas {
+            background-color: var(--bg-blueprint);
+            background-image: 
+                linear-gradient(to right, var(--grid-major) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-major) 1px, transparent 1px),
+                linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+            background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.6);
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            background: #1e293b;
+            height: 6px;
+            border-radius: 3px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: var(--cyan-glow);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(100, 255, 218, 0.5);
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; }
+            .no-print { display: none !important; }
+            .blueprint-canvas {
+                background: white !important;
+                background-image: none !important;
+                border: 2px solid black !important;
+                box-shadow: none !important;
+            }
+            svg text { fill: black !important; }
+            svg line, svg rect, svg path, svg circle { stroke: black !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Top Header / Navigation & Sheet Controls -->
+    <header class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex flex-wrap items-center justify-between gap-4 no-print">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="w-9 h-9 rounded bg-teal-500/10 border border-teal-400/50 flex items-center justify-center text-teal-300 font-bold mono text-sm group-hover:bg-teal-500/20 transition">
+                    DL
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-base font-bold tracking-wide text-slate-100 uppercase">Dexter's Labs</span>
+                        <span class="text-[11px] mono px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/30">dexterslabs.net</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mono">PROJECT 01: RV CORNER WORKSTATION // DWG NO: DL-RV-2026-A</p>
+                </div>
+            </a>
+
+            <nav class="hidden md:flex items-center gap-2 pl-4 border-l border-slate-800">
+                <a href="index.html" class="px-3 py-1.5 text-xs mono rounded bg-slate-800 text-slate-300 border border-slate-700 hover:border-teal-400/50 transition">
+                    ← HOME / LAB
+                </a>
+                <a href="projects.html" class="px-3 py-1.5 text-xs mono rounded bg-teal-500/20 text-teal-300 border border-teal-400/50 font-semibold">
+                    PROJECTS
+                </a>
+            </nav>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="index.html" class="md:hidden px-3 py-1.5 text-xs mono rounded bg-slate-800 text-slate-300 border border-slate-700">
+                ← HOME
+            </a>
+            <button onclick="setView('orthographic')" id="btn-ortho" class="px-3 py-1.5 text-xs mono rounded bg-teal-500/20 text-teal-300 border border-teal-400/50 transition">
+                [1] ORTHOGRAPHIC VIEWS
+            </button>
+            <button onclick="setView('metalwork')" id="btn-metal" class="px-3 py-1.5 text-xs mono rounded bg-slate-800 text-slate-400 border border-slate-700 hover:text-slate-200 transition">
+                [2] METAL PLATE DETAIL
+            </button>
+            <button onclick="setView('electrical')" id="btn-elec" class="px-3 py-1.5 text-xs mono rounded bg-slate-800 text-slate-400 border border-slate-700 hover:text-slate-200 transition">
+                [3] UNDER-DESK ROUTING
+            </button>
+            <button onclick="window.print()" class="ml-1 px-3 py-1.5 text-xs mono rounded bg-amber-500/20 text-amber-300 border border-amber-400/40 hover:bg-amber-500/30 transition">
+                PRINT / PDF
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 flex flex-col lg:flex-row">
+        
+        <!-- Left Control Sidebar (Interactive Dimensions & Layout Abilities) -->
+        <aside class="w-full lg:w-80 bg-slate-900/90 border-r border-slate-800 p-5 flex flex-col gap-6 no-print overflow-y-auto">
+            
+            <!-- Layout Preset Selector -->
+            <div>
+                <label class="block text-xs mono text-teal-400 uppercase tracking-wider mb-2">Structural Mode / Sit-Stand</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="applyPreset('fixed')" id="preset-fixed" class="p-2 text-left rounded border border-teal-500/50 bg-teal-950/30 text-xs">
+                        <div class="font-bold text-teal-300">Fixed RV Post</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">Standard 6" cup bases (No-cost)</div>
+                    </button>
+                    <button onclick="applyPreset('sitstand')" id="preset-sitstand" class="p-2 text-left rounded border border-slate-700 bg-slate-800/50 text-xs hover:border-slate-500">
+                        <div class="font-bold text-slate-200">DIY Sit-Stand Mod</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">Telescoping sleeve + pin collar</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Interactive Dimensional Controls -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-1">
+                    <span class="text-xs mono text-amber-400 uppercase tracking-wider">Skitch Verified Dimensions</span>
+                    <button onclick="toggleUnits()" id="unit-toggle" class="text-[11px] mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                        INCHES (")
+                    </button>
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-xs mono mb-1">
+                        <span class="text-slate-400">Overall Desk Length (L)</span>
+                        <span id="val-length" class="text-teal-300 font-bold">58.0"</span>
+                    </div>
+                    <input type="range" id="in-length" min="48" max="72" step="0.5" value="58" class="w-full" oninput="updateDrawing()">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-xs mono mb-1">
+                        <span class="text-slate-400">Desktop Depth (D)</span>
+                        <span id="val-depth" class="text-teal-300 font-bold">24.0"</span>
+                    </div>
+                    <input type="range" id="in-depth" min="18" max="30" step="0.5" value="24" class="w-full" oninput="updateDrawing()">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-xs mono mb-1">
+                        <span class="text-slate-400">Work Surface Height (H)</span>
+                        <span id="val-height" class="text-teal-300 font-bold">30.5"</span>
+                    </div>
+                    <input type="range" id="in-height" min="28" max="44" step="0.5" value="30.5" class="w-full" oninput="updateDrawing()">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-xs mono mb-1">
+                        <span class="text-slate-400">Post Spacing (Inner)</span>
+                        <span id="val-span" class="text-teal-300 font-bold">36.0"</span>
+                    </div>
+                    <input type="range" id="in-span" min="24" max="44" step="0.5" value="36" class="w-full" oninput="updateDrawing()">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-xs mono mb-1">
+                        <span class="text-slate-400">Wheel-Well Box (36"W × H)</span>
+                        <span id="val-boxh" class="text-teal-300 font-bold">9.0"</span>
+                    </div>
+                    <input type="range" id="in-boxh" min="6" max="14" step="0.5" value="9" class="w-full" oninput="updateDrawing()">
+                </div>
+            </div>
+
+            <!-- Layer Toggles -->
+            <div class="space-y-2">
+                <span class="block text-xs mono text-teal-400 uppercase tracking-wider border-b border-slate-800 pb-1">Drawing Layers</span>
+                <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                    <input type="checkbox" id="layer-dims" checked onchange="updateDrawing()" class="accent-teal-400">
+                    <span>Dimension Lines &amp; Tolerances</span>
+                </label>
+                <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                    <input type="checkbox" id="layer-wood" checked onchange="updateDrawing()" class="accent-teal-400">
+                    <span>Woodworking (Butcher Block / Cleats)</span>
+                </label>
+                <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                    <input type="checkbox" id="layer-metal" checked onchange="updateDrawing()" class="accent-teal-400">
+                    <span>Metalworking (Columns &amp; Cup Bases)</span>
+                </label>
+                <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                    <input type="checkbox" id="layer-equip" checked onchange="updateDrawing()" class="accent-teal-400">
+                    <span>Equipment Clearance Envelope</span>
+                </label>
+            </div>
+
+            <!-- Live Cut List Summary -->
+            <div class="bg-slate-950/80 border border-slate-800 rounded p-3 mono text-[11px] space-y-2">
+                <div class="text-amber-400 font-bold uppercase border-b border-slate-800 pb-1">Auto-Generated Cut List</div>
+                <div id="cut-list-content" class="space-y-1.5 text-slate-300">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center / Right Blueprint Canvas -->
+        <main class="flex-1 flex flex-col blueprint-canvas relative overflow-hidden">
+            
+            <!-- Top Canvas Overlay Bar -->
+            <div class="flex justify-between items-center px-6 py-2 bg-slate-950/40 border-b border-teal-500/10 text-[11px] mono text-teal-400/80">
+                <span id="view-subtitle">VIEW: CORNER ELEVATION &amp; PLAN (58"×24" SLAB, 36" WHEEL WELL, PARTITION WALL)</span>
+                <span>SCALE: NTS (PARAMETRIC) // TOLERANCE: ±0.0625"</span>
+            </div>
+
+            <!-- Interactive SVG Drawing Area -->
+            <div class="flex-1 flex items-center justify-center p-4 overflow-auto">
+                <svg id="cad-svg" viewBox="0 0 1000 720" class="w-full h-full max-w-[1150px] max-h-[780px] select-none">
+                    <defs>
+                        <marker id="arrow-start" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M 10 1 L 0 5 L 10 9 z" fill="#ffb703" />
+                        </marker>
+                        <marker id="arrow-end" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 1 L 10 5 L 0 9 z" fill="#ffb703" />
+                        </marker>
+                        <pattern id="wood-hatch" width="12" height="12" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                            <line x1="0" y1="0" x2="0" y2="12" stroke="#e2b887" stroke-width="0.7" stroke-opacity="0.25" />
+                        </pattern>
+                        <pattern id="steel-hatch" width="8" height="8" patternTransform="rotate(-45 0 0)" patternUnits="userSpaceOnUse">
+                            <line x1="0" y1="0" x2="0" y2="8" stroke="#94a3b8" stroke-width="0.8" stroke-opacity="0.3" />
+                        </pattern>
+                    </defs>
+
+                    <g id="drawing-stage"></g>
+
+                    <!-- Engineering Title Block (Bottom Right of Sheet) -->
+                    <g transform="translate(670, 615)">
+                        <rect x="0" y="0" width="315" height="90" fill="#071324" stroke="#64ffda" stroke-width="1.2"/>
+                        <line x1="0" y1="24" x2="315" y2="24" stroke="#64ffda" stroke-width="0.8"/>
+                        <line x1="0" y1="56" x2="315" y2="56" stroke="#64ffda" stroke-width="0.8"/>
+                        <line x1="185" y1="24" x2="185" y2="90" stroke="#64ffda" stroke-width="0.8"/>
+                        
+                        <text x="10" y="16" fill="#64ffda" font-family="JetBrains Mono" font-size="11" font-weight="bold">DEXTERSLABS.NET // RV SPEC</text>
+                        <text x="10" y="38" fill="#94a3b8" font-family="JetBrains Mono" font-size="9">TOP: 58"×24" // SUB: (2) 12"×58"×1"</text>
+                        <text x="10" y="50" fill="#94a3b8" font-family="JetBrains Mono" font-size="9">POSTS: Ø3" RV PEDESTAL + 6" CUPS</text>
+                        
+                        <text x="193" y="38" fill="#ffb703" font-family="JetBrains Mono" font-size="9">UNITS: <tspan id="tb-units">INCHES</tspan></text>
+                        <text x="193" y="50" fill="#94a3b8" font-family="JetBrains Mono" font-size="9">PSU: MW LRS 5V &amp; 12V</text>
+
+                        <text x="10" y="71" fill="#e2e8f0" font-family="JetBrains Mono" font-size="9">LOC: RIGHT TOYHAULER PARTITION WALL</text>
+                        <text x="10" y="83" fill="#64ffda" font-family="JetBrains Mono" font-size="9">REV: 03 (SKITCH MEASURED + DC PANELS)</text>
+                        <text x="193" y="76" fill="#e2e8f0" font-family="JetBrains Mono" font-size="11" font-weight="bold" id="tb-sheet">SHEET 1 OF 3</text>
+                    </g>
+                </svg>
+            </div>
+        </main>
+    </div>
+
+    <!-- Site Footer -->
+    <footer class="bg-slate-950 border-t border-slate-800 px-6 py-2.5 flex flex-wrap items-center justify-between text-[11px] mono text-slate-400 no-print">
+        <div>© 2026 <span class="text-teal-300 font-semibold">dexterslabs.net</span> — Custom Fabrication, RGB &amp; Car Audio Engineering</div>
+        <div class="flex gap-4">
+            <a href="index.html" class="hover:text-teal-300">HOME</a>
+            <a href="projects.html" class="text-amber-300">PROJECTS</a>
+        </div>
+    </footer>
+
+    <script>
+        let currentView = 'orthographic';
+        let currentPreset = 'fixed';
+        let useMetric = false;
+
+        function fmt(inches) {
+            if (useMetric) {
+                return (inches * 25.4).toFixed(0) + ' mm';
+            }
+            return Number(inches).toFixed(1) + '"';
+        }
+
+        function toggleUnits() {
+            useMetric = !useMetric;
+            document.getElementById('unit-toggle').innerText = useMetric ? 'METRIC (mm)' : 'INCHES (")';
+            document.getElementById('tb-units').textContent = useMetric ? 'MILLIMETERS' : 'INCHES';
+            updateDrawing();
+        }
+
+        function setView(view) {
+            currentView = view;
+            ['ortho', 'metal', 'elec'].forEach(k => {
+                const btn = document.getElementById('btn-' + k);
+                btn.className = "px-3 py-1.5 text-xs mono rounded bg-slate-800 text-slate-400 border border-slate-700 hover:text-slate-200 transition";
+            });
+            const map = { orthographic: 'ortho', metalwork: 'metal', electrical: 'elec' };
+            const activeBtn = document.getElementById('btn-' + map[view]);
+            activeBtn.className = "px-3 py-1.5 text-xs mono rounded bg-teal-500/20 text-teal-300 border border-teal-400/50 transition";
+
+            const titles = {
+                orthographic: 'VIEW: CORNER ELEVATION & PLAN (58"×24" SLAB, 36" WHEEL WELL, PARTITION WALL)',
+                metalwork: 'VIEW: 6" RV CUP PEDESTALS & LOW-COST DIY SIT-STAND CONVERSION DETAIL',
+                electrical: 'VIEW: REAR WALL BOARD (MEAN WELL LRS 5V/12V) & FRONT SWITCH/DIMMER PANELS'
+            };
+            const sheets = { orthographic: 'SHEET 1 OF 3', metalwork: 'SHEET 2 OF 3', electrical: 'SHEET 3 OF 3' };
+            document.getElementById('view-subtitle').innerText = titles[view];
+            document.getElementById('tb-sheet').textContent = sheets[view];
+            updateDrawing();
+        }
+
+        function applyPreset(preset) {
+            currentPreset = preset;
+            const b1 = document.getElementById('preset-fixed');
+            const b2 = document.getElementById('preset-sitstand');
+            if (preset === 'fixed') {
+                b1.className = "p-2 text-left rounded border border-teal-500/50 bg-teal-950/30 text-xs";
+                b2.className = "p-2 text-left rounded border border-slate-700 bg-slate-800/50 text-xs hover:border-slate-500";
+                document.getElementById('in-height').value = 30.5;
+            } else {
+                b2.className = "p-2 text-left rounded border border-teal-500/50 bg-teal-950/30 text-xs";
+                b1.className = "p-2 text-left rounded border border-slate-700 bg-slate-800/50 text-xs hover:border-slate-500";
+                document.getElementById('in-height').value = 40.0;
+            }
+            updateDrawing();
+        }
+
+        function drawDimLine(x1, y1, x2, y2, label, offset = 0, vertical = false) {
+            if (!document.getElementById('layer-dims').checked) return '';
+            let html = '';
+            if (!vertical) {
+                const dy = y1 + offset;
+                html += `<line x1="${x1}" y1="${y1}" x2="${x1}" y2="${dy + (offset > 0 ? 5 : -5)}" stroke="#ffb703" stroke-width="0.7" stroke-dasharray="2,2"/>`;
+                html += `<line x1="${x2}" y1="${y2}" x2="${x2}" y2="${dy + (offset > 0 ? 5 : -5)}" stroke="#ffb703" stroke-width="0.7" stroke-dasharray="2,2"/>`;
+                html += `<line x1="${x1 + 3}" y1="${dy}" x2="${x2 - 3}" y2="${dy}" stroke="#ffb703" stroke-width="1" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>`;
+                const mx = (x1 + x2) / 2;
+                html += `<rect x="${mx - 28}" y="${dy - 8}" width="56" height="15" fill="#0a192f"/>`;
+                html += `<text x="${mx}" y="${dy + 3}" fill="#ffb703" font-family="JetBrains Mono" font-size="10" text-anchor="middle" font-weight="bold">${label}</text>`;
+            } else {
+                const dx = x1 + offset;
+                html += `<line x1="${x1}" y1="${y1}" x2="${dx + (offset > 0 ? 5 : -5)}" y2="${y1}" stroke="#ffb703" stroke-width="0.7" stroke-dasharray="2,2"/>`;
+                html += `<line x1="${x2}" y1="${y2}" x2="${dx + (offset > 0 ? 5 : -5)}" y2="${y2}" stroke="#ffb703" stroke-width="0.7" stroke-dasharray="2,2"/>`;
+                html += `<line x1="${dx}" y1="${y1 + 3}" x2="${dx}" y2="${y2 - 3}" stroke="#ffb703" stroke-width="1" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)"/>`;
+                const my = (y1 + y2) / 2;
+                html += `<rect x="${dx - 26}" y="${my - 8}" width="52" height="15" fill="#0a192f"/>`;
+                html += `<text x="${dx}" y="${my + 3}" fill="#ffb703" font-family="JetBrains Mono" font-size="10" text-anchor="middle" font-weight="bold">${label}</text>`;
+            }
+            return html;
+        }
+
+        function updateDrawing() {
+            const L = parseFloat(document.getElementById('in-length').value);
+            const D = parseFloat(document.getElementById('in-depth').value);
+            const H = parseFloat(document.getElementById('in-height').value);
+            const innerSpan = parseFloat(document.getElementById('in-span').value);
+            const boxH = parseFloat(document.getElementById('in-boxh').value);
+
+            document.getElementById('val-length').innerText = fmt(L);
+            document.getElementById('val-depth').innerText = fmt(D);
+            document.getElementById('val-height').innerText = fmt(H);
+            document.getElementById('val-span').innerText = fmt(innerSpan);
+            document.getElementById('val-boxh').innerText = fmt(boxH);
+
+            const showWood = document.getElementById('layer-wood').checked;
+            const showMetal = document.getElementById('layer-metal').checked;
+            const showEquip = document.getElementById('layer-equip').checked;
+
+            const postDia = 3.0;
+            const cToC = innerSpan + postDia;
+            const edgeInset = ((L - cToC) / 2).toFixed(1);
+
+            document.getElementById('cut-list-content').innerHTML = `
+                <div>• <span class="text-amber-300">TOP SLAB:</span> ${fmt(L)} × ${fmt(D)} × ${fmt(1.5)}</div>
+                <div>• <span class="text-amber-300">SUB-DECK (×2):</span> ${fmt(12)} × ${fmt(L)} × ${fmt(1)}</div>
+                <div>• <span class="text-amber-300">CROSS-MEMBERS:</span> ${fmt(12)} × ${fmt(D)} × ${fmt(1)}</div>
+                <div>• <span class="text-amber-300">REAR PSU BOARD:</span> ${fmt(36)} × ${fmt(14)} × ${fmt(0.75)}</div>
+                <div>• <span class="text-teal-300">RV POSTS (×2):</span> Ø${fmt(3)} + Ø${fmt(6)} CUPS</div>
+            `;
+
+            const stage = document.getElementById('drawing-stage');
+            let svg = '';
+
+            if (currentView === 'orthographic') {
+                const s = 6.8;
+                const wallRightX = 760;
+                const deskW = L * s;
+                const deskX = wallRightX - deskW;
+                const floorY = 335;
+                const topY = floorY - H * s;
+                const slabH = 1.5 * s;
+                const subDeckH = 1.0 * s;
+
+                const centerDeskX = deskX + deskW / 2;
+                const cToCPx = cToC * s;
+                const leg1X = centerDeskX - cToCPx / 2;
+                const leg2X = centerDeskX + cToCPx / 2;
+
+                svg += `<text x="40" y="32" fill="#64ffda" font-family="JetBrains Mono" font-size="12" font-weight="bold">SECTION A-A: RV CORNER ELEVATION (BUTTED TO TOYHAULER WALL)</text>`;
+
+                if (showEquip) {
+                    const doorGapPx = 24 * s;
+                    const doorRightX = deskX - doorGapPx;
+                    svg += `<rect x="${doorRightX - 110}" y="55" width="110" height="${floorY - 55}" fill="none" stroke="#475569" stroke-width="1" stroke-dasharray="4,3"/>`;
+                    svg += `<rect x="${doorRightX - 85}" y="80" width="60" height="85" fill="none" stroke="#475569" stroke-width="0.9"/>`;
+                    svg += `<text x="${doorRightX - 55}" y="210" fill="#64748b" font-family="JetBrains Mono" font-size="9" text-anchor="middle">EXT. DOOR</text>`;
+
+                    svg += `<rect x="${deskX - 75}" y="190" width="24" height="18" fill="none" stroke="#64ffda" stroke-width="0.9"/>`;
+                    svg += `<text x="${deskX - 63}" y="182" fill="#64ffda" font-family="JetBrains Mono" font-size="8" text-anchor="middle">RV SWITCHES</text>`;
+
+                    svg += drawDimLine(doorRightX, 240, deskX, 240, fmt(24.0), 0, false);
+
+                    svg += `<rect x="${deskX - 40}" y="48" width="${deskW + 40}" height="48" fill="none" stroke="#475569" stroke-width="1" stroke-dasharray="4,3"/>`;
+                    svg += `<text x="${centerDeskX}" y="76" fill="#64748b" font-family="JetBrains Mono" font-size="9" text-anchor="middle">OVERHEAD CABINETS &amp; AV SHELF</text>`;
+                    svg += `<rect x="${deskX + 35}" y="110" width="${deskW - 70}" height="105" rx="8" fill="rgba(100,255,218,0.02)" stroke="#475569" stroke-width="1" stroke-dasharray="5,3"/>`;
+                    svg += `<text x="${centerDeskX}" y="155" fill="#64748b" font-family="JetBrains Mono" font-size="9" text-anchor="middle">SIDE WINDOW ZONE</text>`;
+                }
+
+                const wallThickPx = 3 * s;
+                svg += `<rect x="${wallRightX}" y="45" width="${wallThickPx}" height="${floorY - 45}" fill="rgba(100,255,218,0.12)" stroke="#64ffda" stroke-width="1.8"/>`;
+                svg += `<text x="${wallRightX + wallThickPx + 10}" y="135" fill="#64ffda" font-family="JetBrains Mono" font-size="9">3" PARTITION WALL</text>`;
+                svg += `<text x="${wallRightX + wallThickPx + 10}" y="148" fill="#94a3b8" font-family="JetBrains Mono" font-size="8">(TO TOYHAULER AREA)</text>`;
+                svg += `<text x="${wallRightX + wallThickPx + 10}" y="161" fill="#94a3b8" font-family="JetBrains Mono" font-size="8">~3.5 FT DEPTH</text>`;
+
+                svg += `<line x1="30" y1="${floorY}" x2="880" y2="${floorY}" stroke="#64ffda" stroke-width="1.5"/>`;
+
+                if (showWood) {
+                    const boxW = 36 * s;
+                    const boxX = wallRightX - boxW;
+                    const boxHPx = boxH * s;
+                    svg += `<rect x="${boxX}" y="${floorY - boxHPx}" width="${boxW}" height="${boxHPx}" fill="rgba(226,184,135,0.10)" stroke="#e2b887" stroke-width="1.5"/>`;
+                    svg += `<text x="${boxX + boxW/2}" y="${floorY - boxHPx/2 + 3}" fill="#e2b887" font-family="JetBrains Mono" font-size="9" text-anchor="middle">36" × ${fmt(boxH)} TIRE / WHEEL WELL</text>`;
+
+                    const boardW = 36 * s;
+                    const boardH = 11 * s;
+                    const boardY = topY + slabH + subDeckH + 14;
+                    svg += `<rect x="${boxX}" y="${boardY}" width="${boardW}" height="${boardH}" fill="url(#wood-hatch)" stroke="#ffb703" stroke-width="1.2"/>`;
+                    svg += `<rect x="${boxX + 20}" y="${boardY + 12}" width="92" height="46" fill="#0f172a" stroke="#64ffda" stroke-width="1.2"/>`;
+                    svg += `<text x="${boxX + 66}" y="${boardY + 33}" fill="#64ffda" font-family="JetBrains Mono" font-size="8" text-anchor="middle">MEAN WELL LRS</text>`;
+                    svg += `<text x="${boxX + 66}" y="${boardY + 45}" fill="#ffb703" font-family="JetBrains Mono" font-size="8" text-anchor="middle">5V DC PSU</text>`;
+
+                    svg += `<rect x="${boxX + 130}" y="${boardY + 12}" width="92" height="46" fill="#0f172a" stroke="#64ffda" stroke-width="1.2"/>`;
+                    svg += `<text x="${boxX + 176}" y="${boardY + 33}" fill="#64ffda" font-family="JetBrains Mono" font-size="8" text-anchor="middle">MEAN WELL LRS</text>`;
+                    svg += `<text x="${boxX + 176}" y="${boardY + 45}" fill="#ffb703" font-family="JetBrains Mono" font-size="8" text-anchor="middle">12V DC PSU</text>`;
+
+                    svg += `<rect x="${deskX}" y="${topY + slabH}" width="${deskW}" height="${subDeckH}" fill="url(#wood-hatch)" stroke="#e2b887" stroke-width="1.1"/>`;
+                    [leg1X, leg2X].forEach(lx => {
+                        svg += `<rect x="${lx - (6 * s)}" y="${topY + slabH}" width="${12 * s}" height="${subDeckH}" fill="rgba(255,183,3,0.18)" stroke="#ffb703" stroke-width="1.2"/>`;
+                    });
+
+                    svg += `<rect x="${deskX}" y="${topY}" width="${deskW}" height="${slabH}" fill="url(#wood-hatch)" stroke="#e2b887" stroke-width="2"/>`;
+
+                    svg += `<rect x="${deskX + 14}" y="${topY + slabH + subDeckH}" width="76" height="14" fill="#0f172a" stroke="#ffb703" stroke-width="1.2"/>`;
+                    svg += `<text x="${deskX + 52}" y="${topY + slabH + subDeckH + 25}" fill="#ffb703" font-family="JetBrains Mono" font-size="8" text-anchor="middle">5V PANEL (4SW+2DIAL)</text>`;
+
+                    svg += `<rect x="${centerDeskX - 55}" y="${topY + slabH + subDeckH}" width="110" height="14" fill="#0f172a" stroke="#64ffda" stroke-width="1.2"/>`;
+                    svg += `<text x="${centerDeskX}" y="${topY + slabH + subDeckH + 25}" fill="#64ffda" font-family="JetBrains Mono" font-size="8" text-anchor="middle">12V PANEL (9-ROCKER)</text>`;
+                }
+
+                if (showMetal) {
+                    const colW = 3.0 * s;
+                    const cupW = 6.0 * s;
+                    const cupH = 1.4 * s;
+
+                    [leg1X, leg2X].forEach(lx => {
+                        svg += `<rect x="${lx - cupW/2}" y="${topY + slabH + subDeckH}" width="${cupW}" height="${cupH}" rx="2" fill="#94a3b8" stroke="#f8fafc" stroke-width="1.1"/>`;
+                        if (currentPreset === 'fixed') {
+                            svg += `<rect x="${lx - colW/2}" y="${topY + slabH + subDeckH + cupH}" width="${colW}" height="${(H * s) - slabH - subDeckH - cupH*2}" fill="url(#steel-hatch)" stroke="#94a3b8" stroke-width="1.6"/>`;
+                        } else {
+                            const splitY = topY + slabH + subDeckH + cupH + 65;
+                            svg += `<rect x="${lx - (colW*1.12)/2}" y="${topY + slabH + subDeckH + cupH}" width="${colW*1.12}" height="65" fill="url(#steel-hatch)" stroke="#64ffda" stroke-width="1.6"/>`;
+                            svg += `<rect x="${lx - colW/2}" y="${splitY}" width="${colW}" height="${floorY - cupH - splitY}" fill="url(#steel-hatch)" stroke="#94a3b8" stroke-width="1.6"/>`;
+                            svg += `<circle cx="${lx}" cy="${splitY - 10}" r="3" fill="#ffb703"/>`;
+                        }
+                        svg += `<rect x="${lx - cupW/2}" y="${floorY - cupH}" width="${cupW}" height="${cupH}" rx="2" fill="#94a3b8" stroke="#f8fafc" stroke-width="1.2"/>`;
+                    });
+                }
+
+                svg += drawDimLine(deskX, topY, wallRightX, topY, fmt(L), -26, false);
+                svg += drawDimLine(leg1X + (1.5*s), floorY, leg2X - (1.5*s), floorY, fmt(innerSpan), 28, false);
+                svg += drawDimLine(deskX, topY, deskX, floorY, fmt(H), -32, true);
+                svg += drawDimLine(wallRightX - 36*s, floorY - boxH*s, wallRightX, floorY - boxH*s, fmt(36.0), -14, false);
+
+                const planTopY = 415;
+                const deskDPx = D * s;
+
+                svg += `<text x="40" y="400" fill="#64ffda" font-family="JetBrains Mono" font-size="12" font-weight="bold">SECTION B-B: TOP PLAN VIEW (58"×24" SLAB, SUB-PANELS &amp; 6" CUPS)</text>`;
+
+                if (showWood) {
+                    svg += `<rect x="${deskX}" y="${planTopY}" width="${deskW}" height="${deskDPx}" fill="url(#wood-hatch)" stroke="#e2b887" stroke-width="2"/>`;
+                    svg += `<line x1="${deskX}" y1="${planTopY + deskDPx/2}" x2="${wallRightX}" y2="${planTopY + deskDPx/2}" stroke="#e2b887" stroke-width="1" stroke-dasharray="5,3"/>`;
+                    svg += `<text x="${deskX + 12}" y="${planTopY + deskDPx/4}" fill="#e2b887" font-family="JetBrains Mono" font-size="8" opacity="0.8">REAR 12"×58"×1" SUB-PANEL</text>`;
+                    svg += `<text x="${deskX + 12}" y="${planTopY + deskDPx*0.75}" fill="#e2b887" font-family="JetBrains Mono" font-size="8" opacity="0.8">FRONT 12"×58"×1" SUB-PANEL</text>`;
+
+                    [leg1X, leg2X].forEach(lx => {
+                        svg += `<rect x="${lx - 6*s}" y="${planTopY}" width="${12*s}" height="${deskDPx}" fill="rgba(255,183,3,0.08)" stroke="#ffb703" stroke-width="1" stroke-dasharray="3,2"/>`;
+                    });
+
+                    svg += `<line x1="${deskX - 30}" y1="${planTopY}" x2="${wallRightX + wallThickPx}" y2="${planTopY}" stroke="#64ffda" stroke-width="1.5"/>`;
+                    svg += `<rect x="${wallRightX}" y="${planTopY}" width="${wallThickPx}" height="${42 * s * 0.65}" fill="rgba(100,255,218,0.12)" stroke="#64ffda" stroke-width="1.5"/>`;
+                }
+
+                if (showMetal) {
+                    const cupR = 3.0 * s;
+                    const postR = 1.5 * s;
+                    const postCenterY = planTopY + deskDPx * 0.55;
+                    [leg1X, leg2X].forEach(lx => {
+                        svg += `<circle cx="${lx}" cy="${postCenterY}" r="${cupR}" fill="rgba(148,163,184,0.2)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3,2"/>`;
+                        svg += `<circle cx="${lx}" cy="${postCenterY}" r="${postR}" fill="#0a192f" stroke="#f8fafc" stroke-width="1.5"/>`;
+                        svg += `<line x1="${lx - 12}" y1="${postCenterY}" x2="${lx + 12}" y2="${postCenterY}" stroke="#64ffda" stroke-width="0.7"/>`;
+                        svg += `<line x1="${lx}" y1="${postCenterY - 12}" x2="${lx}" y2="${postCenterY + 12}" stroke="#64ffda" stroke-width="0.7"/>`;
+                    });
+                }
+
+                svg += drawDimLine(deskX, planTopY, deskX, planTopY + deskDPx, fmt(D), -32, true);
+                svg += drawDimLine(deskX, planTopY + deskDPx, leg1X - (1.5*s), planTopY + deskDPx, fmt(edgeInset - 1.5), 24, false);
+                svg += drawDimLine(leg2X + (1.5*s), planTopY + deskDPx, wallRightX, planTopY + deskDPx, fmt(edgeInset - 1.5), 24, false);
+
+            } else if (currentView === 'metalwork') {
+                svg += `<text x="40" y="38" fill="#64ffda" font-family="JetBrains Mono" font-size="13" font-weight="bold">DETAIL M-1: Ø3" RV TABLE POSTS + Ø6" CUP BASES &amp; LOW-COST SIT-STAND MOD</text>`;
+                svg += `<text x="40" y="56" fill="#94a3b8" font-family="JetBrains Mono" font-size="10">SOLUTION TO Q1/Q2: SLEEVE YOUR FIXED Ø3" POSTS INSIDE Ø3.5" SCH-40 TUBE W/ HITCH PIN</text>`;
+
+                const lx = 170, ly = 130;
+                svg += `<text x="${lx + 50}" y="${ly - 20}" fill="#e2e8f0" font-family="JetBrains Mono" font-size="11" text-anchor="middle" font-weight="bold">EXISTING FIXED RV POST</text>`;
+                svg += `<rect x="${lx}" y="${ly}" width="100" height="22" rx="3" fill="#94a3b8" stroke="#f8fafc" stroke-width="1.5"/>`;
+                svg += `<text x="${lx + 50}" y="${ly + 14}" fill="#0a192f" font-family="JetBrains Mono" font-size="9" text-anchor="middle" font-weight="bold">Ø6" TOP CUP</text>`;
+                svg += `<rect x="${lx + 25}" y="${ly + 22}" width="50" height="330" fill="url(#steel-hatch)" stroke="#94a3b8" stroke-width="2"/>`;
+                svg += `<rect x="${lx}" y="${ly + 352}" width="100" height="22" rx="3" fill="#94a3b8" stroke="#f8fafc" stroke-width="1.5"/>`;
+                svg += `<text x="${lx + 50}" y="${ly + 366}" fill="#0a192f" font-family="JetBrains Mono" font-size="9" text-anchor="middle" font-weight="bold">Ø6" BASE CUP</text>`;
+
+                svg += drawDimLine(lx, ly, lx + 100, ly, 'Ø6.0"', -25, false);
+                svg += drawDimLine(lx + 25, ly + 180, lx + 75, ly + 180, 'Ø3.0"', 0, false);
+
+                const rx = 510, ry = 105;
+                svg += `<text x="${rx + 70}" y="${ry - 18}" fill="#64ffda" font-family="JetBrains Mono" font-size="11" text-anchor="middle" font-weight="bold">DIY SIT-STAND CONVERSION (~$30)</text>`;
+                
+                svg += `<rect x="${rx + 20}" y="${ry}" width="100" height="22" rx="3" fill="#94a3b8" stroke="#f8fafc" stroke-width="1.5"/>`;
+                svg += `<rect x="${rx + 40}" y="${ry + 22}" width="60" height="190" fill="rgba(100,255,218,0.12)" stroke="#64ffda" stroke-width="2"/>`;
+                svg += `<rect x="${rx + 45}" y="${ry + 115}" width="50" height="270" fill="url(#steel-hatch)" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="4,2"/>`;
+                
+                [ry + 145, ry + 170, ry + 195].forEach(py => {
+                    svg += `<circle cx="${rx + 70}" cy="${py}" r="5" fill="#0a192f" stroke="#ffb703" stroke-width="1.5"/>`;
+                });
+                svg += `<line x1="${rx + 25}" y1="${ry + 195}" x2="${rx + 115}" y2="${ry + 195}" stroke="#ffb703" stroke-width="3.5"/>`;
+                svg += `<circle cx="${rx + 25}" cy="${ry + 195}" r="7" fill="none" stroke="#ffb703" stroke-width="2"/>`;
+
+                svg += `<rect x="${rx + 20}" y="${ry + 385}" width="100" height="22" rx="3" fill="#94a3b8" stroke="#f8fafc" stroke-width="1.5"/>`;
+
+                svg += `<rect x="${rx + 150}" y="${ry + 20}" width="295" height="240" rx="6" fill="#071324" stroke="#64ffda" stroke-width="1"/>`;
+                svg += `<text x="${rx + 162}" y="${ry + 44}" fill="#64ffda" font-family="JetBrains Mono" font-size="10" font-weight="bold">LOW-COST SIT-STAND BOM:</text>`;
+                svg += `<text x="${rx + 162}" y="${ry + 68}" fill="#e2e8f0" font-family="JetBrains Mono" font-size="9">1. (2) 18" pcs of 3.5" ID Steel/Alum</text>`;
+                svg += `<text x="${rx + 174}" y="${ry + 81}" fill="#94a3b8" font-family="JetBrains Mono" font-size="8.5">or Sch-40 PVC sleeve (sleeves over Ø3")</text>`;
+                svg += `<text x="${rx + 162}" y="${ry + 105}" fill="#e2e8f0" font-family="JetBrains Mono" font-size="9">2. Drill 3/8" cross-holes at 30.5" (Sit)</text>`;
+                svg += `<text x="${rx + 174}" y="${ry + 118}" fill="#94a3b8" font-family="JetBrains Mono" font-size="8.5">&amp; 41.5" (Stand) heights</text>`;
+                svg += `<text x="${rx + 162}" y="${ry + 142}" fill="#e2e8f0" font-family="JetBrains Mono" font-size="9">3. (2) 3/8" PTO / Tractor Hitch Pins</text>`;
+                svg += `<text x="${rx + 162}" y="${ry + 166}" fill="#ffb703" font-family="JetBrains Mono" font-size="9">4. IMPORTANT: Detach rear wall cleat</text>`;
+                svg += `<text x="${rx + 174}" y="${ry + 179}" fill="#94a3b8" font-family="JetBrains Mono" font-size="8.5">or use vertical drawer slides on wall</text>`;
+                svg += `<text x="${rx + 174}" y="${ry + 192}" fill="#94a3b8" font-family="JetBrains Mono" font-size="8.5">so desk lifts freely without binding!</text>`;
+
+            } else if (currentView === 'electrical') {
+                svg += `<text x="40" y="38" fill="#64ffda" font-family="JetBrains Mono" font-size="13" font-weight="bold">DETAIL E-1: REAR WALL PSU BOARD &amp; UNDERSIDE ROCKER/DIMMER PANELS</text>`;
+                svg += `<text x="40" y="56" fill="#94a3b8" font-family="JetBrains Mono" font-size="10">DUAL MEAN WELL LRS POWER SUPPLIES (5V &amp; 12V) → FRONT LEFT 5V PANEL &amp; CENTER 12V PANEL</text>`;
+
+                const bx = 90, by = 85, bw = 820, bh = 215;
+                svg += `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="url(#wood-hatch)" stroke="#e2b887" stroke-width="2"/>`;
+                svg += `<text x="${bx + 15}" y="${by + 20}" fill="#e2b887" font-family="JetBrains Mono" font-size="10" font-weight="bold">REAR WALL PSU MOUNTING BOARD (MOUNTED ABOVE 36" WHEEL WELL)</text>`;
+
+                svg += `<rect x="${bx + 45}" y="${by + 42}" width="210" height="115" rx="4" fill="#0f172a" stroke="#ffb703" stroke-width="2"/>`;
+                svg += `<rect x="${bx + 55}" y="${by + 52}" width="145" height="95" fill="none" stroke="#475569" stroke-width="1" stroke-dasharray="2,2"/>`;
+                svg += `<text x="${bx + 127}" y="${by + 92}" fill="#ffb703" font-family="JetBrains Mono" font-size="11" text-anchor="middle" font-weight="bold">MEAN WELL LRS-5V</text>`;
+                svg += `<text x="${bx + 127}" y="${by + 108}" fill="#94a3b8" font-family="JetBrains Mono" font-size="9" text-anchor="middle">5V DC REGULATED SUPPLY</text>`;
+                svg += `<rect x="${bx + 210}" y="${by + 55}" width="35" height="90" fill="#1e293b" stroke="#64ffda" stroke-width="1"/>`;
+                svg += `<text x="${bx + 227}" y="${by + 103}" fill="#64ffda" font-family="JetBrains Mono" font-size="8" text-anchor="middle" transform="rotate(-90 ${bx + 227} ${by + 103})">AC IN / +5V -V</text>`;
+
+                svg += `<rect x="${bx + 310}" y="${by + 42}" width="210" height="115" rx="4" fill="#0f172a" stroke="#64ffda" stroke-width="2"/>`;
+                svg += `<rect x="${bx + 320}" y="${by + 52}" width="145" height="95" fill="none" stroke="#475569" stroke-width="1" stroke-dasharray="2,2"/>`;
+                svg += `<text x="${bx + 392}" y="${by + 92}" fill="#64ffda" font-family="JetBrains Mono" font-size="11" text-anchor="middle" font-weight="bold">MEAN WELL LRS-12V</text>`;
+                svg += `<text x="${bx + 392}" y="${by + 108}" fill="#94a3b8" font-family="JetBrains Mono" font-size="9" text-anchor="middle">12V DC REGULATED SUPPLY</text>`;
+                svg += `<rect x="${bx + 475}" y="${by + 55}" width="35" height="90" fill="#1e293b" stroke="#64ffda" stroke-width="1"/>`;
+                svg += `<text x="${bx + 492}" y="${by + 103}" fill="#64ffda" font-family="JetBrains Mono" font-size="8" text-anchor="middle" transform="rotate(-90 ${bx + 492} ${by + 103})">AC IN / +12V -V</text>`;
+
+                svg += `<rect x="${bx + 565}" y="${by + 48}" width="215" height="105" rx="4" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5"/>`;
+                svg += `<text x="${bx + 672}" y="${by + 72}" fill="#e2e8f0" font-family="JetBrains Mono" font-size="10" text-anchor="middle" font-weight="bold">DUAL DC FUSE BUSBARS</text>`;
+                svg += `<text x="${bx + 672}" y="${by + 94}" fill="#ffb703" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle">• 5V BUS → FRONT LEFT PANEL</text>`;
+                svg += `<text x="${bx + 672}" y="${by + 112}" fill="#64ffda" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle">• 12V BUS → CENTER 9-GANG PANEL</text>`;
+                svg += `<text x="${bx + 672}" y="${by + 130}" fill="#94a3b8" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle">• SHELF DIMMER PWM LEADS (×4)</text>`;
+
+                const py = 345;
+                svg += `<text x="90" y="${py - 12}" fill="#64ffda" font-family="JetBrains Mono" font-size="11" font-weight="bold">FRONT UNDERSIDE CONTROL PANELS (FLUSH / BRACKET MOUNTED UNDER DESK LIP)</text>`;
+
+                svg += `<rect x="90" y="${py}" width="340" height="235" rx="6" fill="#0f172a" stroke="#ffb703" stroke-width="2"/>`;
+                svg += `<text x="260" y="${py + 22}" fill="#ffb703" font-family="JetBrains Mono" font-size="10" text-anchor="middle" font-weight="bold">PANEL A (FRONT LEFT): 5V LIGHTING &amp; RACK</text>`;
+
+                const swLabels5V = ['UNDER-DESK COB', 'CEILING LED', 'MONITOR RGB', 'AUX 5V'];
+                for (let i = 0; i < 4; i++) {
+                    const sx = 112 + i * 76;
+                    svg += `<rect x="${sx}" y="${py + 38}" width="58" height="44" rx="4" fill="#1e293b" stroke="#ffb703" stroke-width="1.2"/>`;
+                    svg += `<line x1="${sx + 10}" y1="${py + 60}" x2="${sx + 48}" y2="${py + 60}" stroke="#ffb703" stroke-width="1"/>`;
+                    svg += `<text x="${sx + 29}" y="${py + 95}" fill="#e2e8f0" font-family="JetBrains Mono" font-size="7.5" text-anchor="middle">${swLabels5V[i]}</text>`;
+                }
+
+                svg += `<circle cx="175" cy="${py + 152}" r="26" fill="#1e293b" stroke="#64ffda" stroke-width="2"/>`;
+                svg += `<line x1="175" y1="${py + 152}" x2="192" y2="${py + 135}" stroke="#64ffda" stroke-width="2.5"/>`;
+                svg += `<text x="175" y="${py + 194}" fill="#64ffda" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle" font-weight="bold">DIAL 1: RACK FANS</text>`;
+                svg += `<text x="175" y="${py + 206}" fill="#94a3b8" font-family="JetBrains Mono" font-size="7.5" text-anchor="middle">(LEFT AUDIO RACK)</text>`;
+
+                svg += `<circle cx="335" cy="${py + 152}" r="26" fill="#1e293b" stroke="#ffb703" stroke-width="2"/>`;
+                svg += `<line x1="335" y1="${py + 152}" x2="352" y2="${py + 135}" stroke="#ffb703" stroke-width="2.5"/>`;
+                svg += `<text x="335" y="${py + 194}" fill="#ffb703" font-family="JetBrains Mono" font-size="8.5" text-anchor="middle" font-weight="bold">DIAL 2: 4-SHELF DIMMER</text>`;
+                svg += `<text x="335" y="${py + 206}" fill="#94a3b8" font-family="JetBrains Mono" font-size="7.5" text-anchor="middle">(4 RACK SHELF LEDS)</text>`;
+
+                svg += `<rect x="460" y="${py}" width="450" height="235" rx="6" fill="#0f172a" stroke="#64ffda" stroke-width="2"/>`;
+                svg += `<text x="685" y="${py + 22}" fill="#64ffda" font-family="JetBrains Mono" font-size="10" text-anchor="middle" font-weight="bold">PANEL B (CENTER): 12V 9-GANG DEVICE SWITCH BANK</text>`;
+
+                for (let i = 0; i < 9; i++) {
+                    const row = Math.floor(i / 5);
+                    const col = i % 5;
+                    const rxPos = 485 + col * 82 + (row === 1 ? 40 : 0);
+                    const ryPos = py + 45 + row * 85;
+                    svg += `<rect x="${rxPos}" y="${ryPos}" width="64" height="48" rx="4" fill="#1e293b" stroke="#64ffda" stroke-width="1.3"/>`;
+                    svg += `<circle cx="${rxPos + 32}" cy="${ryPos + 14}" r="3" fill="#64ffda"/>`;
+                    svg += `<text x="${rxPos + 32}" y="${ryPos + 63}" fill="#e2e8f0" font-family="JetBrains Mono" font-size="8" text-anchor="middle">12V CH-${i + 1}</text>`;
+                }
+            }
+
+            stage.innerHTML = svg;
+        }
+
+        updateDrawing();
+    </script>
+</body>
+</html>
