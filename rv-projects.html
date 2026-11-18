@@ -1,0 +1,3000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DEXTERSLABS.NET // CAD DRAWING SET: SHT-01 SPORTSTER GUT & SHT-02 40U POWER/HOMELAB RACK</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bp-bg: #081224;
+      --bp-panel: #0b1830;
+      --bp-panel-alt: #0e1e3b;
+      --bp-cyan: #38bdf8;
+      --bp-cyan-bright: #7dd3fc;
+      --bp-cyan-dim: rgba(56, 189, 248, 0.22);
+      --bp-grid-minor: rgba(56, 189, 248, 0.065);
+      --bp-grid-major: rgba(56, 189, 248, 0.16);
+      --bp-demo: #f43f5e;
+      --bp-warn: #f59e0b;
+      --bp-ok: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+    }
+
+    body {
+      background-color: var(--bp-bg);
+      color: #e0f2fe;
+      background-image:
+        linear-gradient(to right, var(--bp-grid-major) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--bp-grid-major) 1px, transparent 1px),
+        linear-gradient(to right, var(--bp-grid-minor) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--bp-grid-minor) 1px, transparent 1px);
+      background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+      background-position: -1px -1px;
+      overflow-x: hidden;
+    }
+
+    /* Technical CAD drafting corners */
+    .cad-box {
+      position: relative;
+      border: 1px solid rgba(56, 189, 248, 0.42);
+      background: rgba(10, 20, 40, 0.88);
+      box-shadow: 0 0 24px rgba(2, 6, 23, 0.7), inset 0 0 18px rgba(56, 189, 248, 0.04);
+    }
+
+    .cad-box::before,
+    .cad-box::after {
+      content: '';
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      border-color: #7dd3fc;
+      pointer-events: none;
+    }
+
+    .cad-box::before {
+      top: -1px;
+      left: -1px;
+      border-top: 2px solid #7dd3fc;
+      border-left: 2px solid #7dd3fc;
+    }
+
+    .cad-box::after {
+      bottom: -1px;
+      right: -1px;
+      border-bottom: 2px solid #7dd3fc;
+      border-right: 2px solid #7dd3fc;
+    }
+
+    /* Blueprint Viewport Grid */
+    .blueprint-stage {
+      background-color: #071021;
+      background-image:
+        radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.07) 0%, transparent 75%),
+        linear-gradient(to right, rgba(56, 189, 248, 0.14) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 189, 248, 0.14) 1px, transparent 1px),
+        linear-gradient(to right, rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+      background-size: 100% 100%, 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+      touch-action: none;
+    }
+
+    /* Interactive SVG Zone Hover & Active States */
+    .zone-group {
+      cursor: pointer;
+      transition: filter 0.18s ease, opacity 0.2s ease;
+    }
+
+    .zone-group:hover {
+      filter: drop-shadow(0 0 6px rgba(125, 211, 252, 0.65));
+    }
+
+    .zone-selected {
+      filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.9)) !important;
+    }
+
+    @keyframes pulseDash {
+      to {
+        stroke-dashoffset: -24;
+      }
+    }
+
+    .demo-hatch-line {
+      animation: pulseDash 1.4s linear infinite;
+    }
+
+    /* Draggable Caliper Guides */
+    .caliper-h {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 22px;
+      margin-top: -11px;
+      cursor: ns-resize;
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      user-select: none;
+    }
+
+    .caliper-h-line {
+      width: 100%;
+      height: 1px;
+      border-top: 1.5px dashed #fbbf24;
+      box-shadow: 0 0 8px rgba(251, 191, 36, 0.7);
+    }
+
+    .caliper-v {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 22px;
+      margin-left: -11px;
+      cursor: ew-resize;
+      z-index: 25;
+      display: flex;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .caliper-v-line {
+      height: 100%;
+      width: 1px;
+      border-left: 1.5px dashed #fbbf24;
+      box-shadow: 0 0 8px rgba(251, 191, 36, 0.7);
+    }
+
+    /* Rack Elevation Slot Styling */
+    .rack-unit-row {
+      transition: background-color 0.14s ease, border-color 0.14s ease;
+    }
+    .rack-unit-row:hover {
+      background-color: rgba(56, 189, 248, 0.12);
+    }
+    .rack-cage-mesh {
+      background-image: radial-gradient(rgba(56, 189, 248, 0.28) 1px, transparent 1px);
+      background-size: 6px 6px;
+    }
+
+    /* Custom thin scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #071021;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e3a5f;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #38bdf8;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col text-xs sm:text-sm selection:bg-sky-400 selection:text-slate-950">
+
+  <!-- TOP DRAFTING HEADER & NAVIGATION BAR -->
+  <header class="border-b border-sky-500/40 bg-[#071122]/95 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-[1600px] mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand / Lab Identity -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded border border-sky-400/70 bg-sky-950/60 flex items-center justify-center relative shrink-0">
+          <svg class="w-5 h-5 text-sky-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+            <path d="M3 3h18v18H3z" stroke-dasharray="3 2"/>
+            <path d="M3 12h18M12 3v18"/>
+            <circle cx="12" cy="12" r="3.5" fill="#081224"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold tracking-wider text-sky-300 text-sm sm:text-base">DEXTERSLABS.NET</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/15 border border-sky-400/40 text-sky-300">CAD-REV 2.4</span>
+          </div>
+          <p class="text-[11px] text-sky-200/70 hidden sm:block">WOODWORKING // METALWORKING // RV STRUCTURAL & 12V SYSTEMS</p>
+        </div>
+      </div>
+
+      <!-- Navigation Sheet Switcher -->
+      <nav class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <button onclick="switchTopTab('sheet01')" id="nav-sheet01" class="px-2.5 py-1.5 rounded border border-sky-400 bg-sky-500/20 text-white font-semibold text-xs transition flex items-center gap-1.5 shadow-[0_0_12px_rgba(56,189,248,0.25)]">
+          <span class="text-sky-300 font-bold">TAB 01:</span>
+          <span>[SHEET-01 // SPORTSTER-2004-GUT]</span>
+        </button>
+
+        <button onclick="switchTopTab('sheet02')" id="nav-sheet02" class="px-2.5 py-1.5 rounded border border-sky-500/30 bg-sky-950/30 hover:bg-sky-900/50 text-sky-200 text-xs transition flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>TAB 02: [SHEET-02 // POWER-HOMELAB-RACK-CONFIG]</span>
+        </button>
+
+        <button onclick="switchTopTab('overview')" id="nav-overview" class="px-2.5 py-1.5 rounded border border-sky-500/30 bg-sky-950/30 hover:bg-sky-900/50 text-sky-200 text-xs transition flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+          <span>INDEX // LAB ARCHIVE</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- NOTIFICATION TOAST (NO ALERT()) -->
+  <div id="toast-banner" class="fixed bottom-4 right-4 z-50 hidden max-w-sm rounded border border-sky-400 bg-[#0b1930] px-4 py-3 text-xs text-sky-100 shadow-2xl">
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="text-sky-400 font-bold">[SYS]</span>
+        <span id="toast-msg">Action completed.</span>
+      </div>
+      <button onclick="hideToast()" class="text-sky-400 hover:text-white font-bold">✕</button>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 1: LAB OVERVIEW (DEXTERSLABS.NET INDEX)                           -->
+  <!-- ===================================================================== -->
+  <section id="view-overview" class="hidden max-w-[1600px] w-full mx-auto px-3 sm:px-6 py-6 space-y-6">
+    <div class="cad-box rounded p-5 sm:p-6">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-sky-500/30 pb-4">
+        <div>
+          <div class="text-xs text-sky-400 tracking-widest uppercase mb-1">DEXTERSLABS.NET // ENGINEERING & FABRICATION ARCHIVE</div>
+          <h1 class="text-xl sm:text-2xl font-bold text-white">HARDWARE, WOODWORKING, RV RENOVATION & 12V POWER LAB</h1>
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs">
+          <span class="px-2.5 py-1 rounded bg-sky-950 border border-sky-500/40 text-sky-300">LOC: MOBILE WORKSHOP</span>
+          <span class="px-2.5 py-1 rounded bg-emerald-950/60 border border-emerald-500/40 text-emerald-300">ACTIVE BUILD: 2004 SPORTSTER TOY HAULER</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+        <div class="rounded border border-sky-500/30 bg-[#081326] p-4 space-y-2">
+          <div class="text-sky-400 font-bold text-xs tracking-wider">01 // WOOD & METAL FABRICATION</div>
+          <p class="text-xs text-sky-100/80 leading-relaxed">
+            Custom structural framing, tongue-and-groove subflooring, pine workstation cabinetry, and aluminum chassis/ramp weather-sealing designed for high-vibration mobile environments.
+          </p>
+        </div>
+        <div class="rounded border border-sky-500/30 bg-[#081326] p-4 space-y-2">
+          <div class="text-sky-400 font-bold text-xs tracking-wider">02 // 12V DC, CAR AUDIO & WLED</div>
+          <p class="text-xs text-sky-100/80 leading-relaxed">
+            Dual-rail Mean Well 5V/12V power distribution, fused rocker switch control panels, high-output USB-C PD 3.1 buck stages, and addressable RGB/WLED ambient lighting channels.
+          </p>
+        </div>
+        <div class="rounded border border-sky-500/30 bg-[#081326] p-4 space-y-2">
+          <div class="text-sky-400 font-bold text-xs tracking-wider">03 // MOBILE HOMELAB & NETWORKING</div>
+          <p class="text-xs text-sky-100/80 leading-relaxed">
+            Compact NAS storage arrays, UPS battery backup integration, and low-idle compute nodes engineered directly into the RV workstation footprint.
+          </p>
+        </div>
+      </div>
+
+      <!-- Project Index Cards -->
+      <div class="mt-6">
+        <h2 class="text-xs font-bold tracking-widest text-sky-300 uppercase mb-3">ACTIVE BLUEPRINT SHEETS DIRECTORY</h2>
+        <div id="overview-sheets-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Sheet 01 Card -->
+          <div onclick="switchTopTab('sheet01')" class="cursor-pointer rounded border border-sky-500/40 hover:border-sky-300 bg-[#09162b] p-4 transition group">
+            <div class="flex items-center justify-between text-xs mb-2">
+              <span class="font-bold text-sky-400">SHEET 01 // SPORTSTER-2004-GUT</span>
+              <span class="px-2 py-0.5 rounded bg-sky-500/10 border border-sky-400/30 text-[11px] text-sky-300">CAMPER SHELL</span>
+            </div>
+            <h3 class="font-bold text-white group-hover:text-sky-300 transition">2004 Sportster Toy Hauler Full Interior Gut &amp; Rebuild</h3>
+            <p class="text-xs text-sky-100/70 mt-1.5">Complete demo of front bed frame, couch, dinette, flood-damaged 3/4" subfloor replacement, rear ramp/roof sealing, and Phase 2 58"×24" workstation preview.</p>
+            <div class="mt-3 pt-2 border-t border-sky-500/20 flex justify-between text-[11px] text-sky-300">
+              <span>26'-0" × 8'-6" SHELL</span>
+              <span>OPEN SHEET 01 →</span>
+            </div>
+          </div>
+
+          <!-- Sheet 02 Card -->
+          <div onclick="switchTopTab('sheet02')" class="cursor-pointer rounded border-2 border-emerald-400/70 hover:border-emerald-300 bg-[#09182e] p-4 transition group">
+            <div class="flex items-center justify-between text-xs mb-2">
+              <span class="font-bold text-emerald-400">SHEET 02 // POWER-HOMELAB-RACK-CONFIG</span>
+              <span class="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-400/40 text-[11px] text-emerald-300">40U / 42U RACK CAD</span>
+            </div>
+            <h3 class="font-bold text-white group-hover:text-emerald-300 transition">40U/42U Power &amp; Homelab Rack Elevation Configurator</h3>
+            <p class="text-xs text-sky-100/70 mt-1.5">Full-cage 40U/42U enclosures, Ubiquiti UniFi &amp; MikroTik switches/routers, pull-out shelves, pure sine wave UPS designs, Furman/Isobar surge, and Mean Well 12V/5V DC panels.</p>
+            <div class="mt-3 pt-2 border-t border-sky-500/20 flex justify-between text-[11px] text-emerald-300">
+              <span>U40 → U01 ELEVATION</span>
+              <span>OPEN SHEET 02 →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 2: TAB 01 [SHEET-01 // SPORTSTER-2004-GUT]                       -->
+  <!-- ===================================================================== -->
+  <main id="view-sheet01" class="max-w-[1600px] w-full mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-4 flex-1">
+
+    <!-- ARCHITECTURAL TITLE BLOCK HEADER -->
+    <div class="cad-box rounded p-3.5 sm:p-4">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-center">
+        <div class="lg:col-span-6 space-y-1">
+          <div class="flex flex-wrap items-center gap-2 text-[11px] text-sky-400">
+            <span class="font-bold">DEXTERSLABS.NET // SHEET-01 // SPORTSTER-2004-GUT</span>
+            <span>|</span>
+            <span>MODEL: 2004 SPORTSTER TOY HAULER (26FT BUMPER PULL)</span>
+          </div>
+          <h1 class="text-base sm:text-xl font-bold text-white tracking-tight">
+            2004 SPORTSTER TOY HAULER GUT &amp; SHELL REBUILD — BASE MODEL
+          </h1>
+        </div>
+
+        <!-- Title Block Stamp Metadata -->
+        <div class="lg:col-span-6 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+          <div class="rounded border border-sky-500/30 bg-[#071122] px-2.5 py-1.5">
+            <div class="text-sky-400/80 text-[10px]">SHELL ENVELOPE</div>
+            <div class="font-bold text-white">26'-0" × 8'-6"</div>
+          </div>
+          <div class="rounded border border-sky-500/30 bg-[#071122] px-2.5 py-1.5">
+            <div class="text-sky-400/80 text-[10px]">SCALE / GRID</div>
+            <div class="font-bold text-white">1/2" = 1'-0" (SNAP)</div>
+          </div>
+          <div class="rounded border border-sky-500/30 bg-[#071122] px-2.5 py-1.5">
+            <div class="text-sky-400/80 text-[10px]">CURSOR COORDS</div>
+            <div id="cursor-coords" class="font-bold text-sky-300">X: 0'-0" Y: 0'-0"</div>
+          </div>
+          <div class="rounded border border-emerald-500/40 bg-emerald-950/30 px-2.5 py-1.5">
+            <div class="text-emerald-400 text-[10px]">STRIP-OUT STATUS</div>
+            <div class="flex items-center justify-between gap-1.5">
+              <span id="title-progress-pct" class="font-bold text-emerald-300">33%</span>
+              <div class="w-12 h-1.5 bg-slate-900 rounded overflow-hidden">
+                <div id="title-progress-bar" class="h-full bg-emerald-400 transition-all duration-300" style="width: 33%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLUEPRINT LAYER CONTROLS & INTERACTIVE MEASUREMENT TOOLBAR -->
+    <div class="cad-box rounded p-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- View Mode Layer Selector -->
+      <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <span class="text-[11px] font-bold text-sky-400 mr-1">LAYER VIEW:</span>
+        <button onclick="setBlueprintLayer('demo')" id="btn-layer-demo" class="px-3 py-1.5 rounded text-xs font-semibold border border-rose-400 bg-rose-500/20 text-rose-200 transition flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+          <span>1. AS-IS / DEMO LAYER</span>
+        </button>
+        <button onclick="setBlueprintLayer('shell')" id="btn-layer-shell" class="px-3 py-1.5 rounded text-xs font-semibold border border-sky-500/40 bg-sky-950/40 text-sky-200 hover:border-sky-300 transition flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+          <span>2. STRIPPED SHELL / SUBFLOOR</span>
+        </button>
+        <button onclick="setBlueprintLayer('phase2')" id="btn-layer-phase2" class="px-3 py-1.5 rounded text-xs font-semibold border border-sky-500/40 bg-sky-950/40 text-sky-200 hover:border-emerald-300 transition flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>3. PHASE 2 BUILD-OUT PREVIEW</span>
+        </button>
+      </div>
+
+      <!-- Measurement & Caliper Tools -->
+      <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <span class="text-[11px] font-bold text-amber-400 mr-1">CAD TOOLS:</span>
+        <button onclick="toggleCalipers()" id="btn-toggle-calipers" class="px-2.5 py-1.5 rounded text-xs font-semibold border border-amber-400 bg-amber-500/20 text-amber-200 transition">
+          ⌖ CALIPER GUIDES: ON
+        </button>
+        <button onclick="toggleTapeTool()" id="btn-toggle-tape" class="px-2.5 py-1.5 rounded text-xs font-semibold border border-sky-500/40 bg-sky-950/40 text-sky-200 hover:border-sky-300 transition">
+          📏 POINT-TO-POINT TAPE: OFF
+        </button>
+        <button onclick="toggleSnapGrid()" id="btn-toggle-snap" class="px-2.5 py-1.5 rounded text-xs font-semibold border border-sky-400/60 bg-sky-500/15 text-sky-200 transition">
+          ⊞ SNAP (6"): ON
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN WORKSPACE GRID: INTERACTIVE FLOORPLAN + ZONE INSPECTOR -->
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
+
+      <!-- LEFT / CENTER: INTERACTIVE SVG CAD FLOORPLAN CANVAS (8 COLS ON XL) -->
+      <div class="xl:col-span-8 cad-box rounded p-3 sm:p-4 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-sky-300/80 border-b border-sky-500/25 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="px-1.5 py-0.5 rounded bg-sky-500/15 border border-sky-400/30 text-sky-300 font-bold">PLAN VIEW // TOP-DOWN CUTAWAY</span>
+            <span id="layer-status-desc" class="text-rose-300 font-medium">SHOWING: OEM FIXTURES &amp; WATER-DAMAGED SUBFLOOR SLATED FOR FULL REMOVAL</span>
+          </div>
+          <div id="tape-readout-pill" class="hidden px-2.5 py-0.5 rounded bg-amber-500/20 border border-amber-400 text-amber-200 font-bold">
+            TAPE: CLICK START POINT ON SHELL
+          </div>
+        </div>
+
+        <!-- INTERACTIVE BLUEPRINT STAGE CONTAINER -->
+        <div id="blueprint-container" class="blueprint-stage relative w-full rounded border border-sky-500/50 overflow-hidden select-none">
+
+          <!-- DRAGGABLE HORIZONTAL CALIPER RULER -->
+          <div id="caliper-h" class="caliper-h" style="top: 38%;" title="Drag vertically to measure camper width / clearances">
+            <div class="caliper-h-line"></div>
+            <span id="caliper-h-label" class="absolute left-3 -top-5 px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 font-bold text-[10px] shadow">
+              Y-AXIS: 3'-2" FROM CURBSIDE WALL
+            </span>
+          </div>
+
+          <!-- DRAGGABLE VERTICAL CALIPER RULER -->
+          <div id="caliper-v" class="caliper-v" style="left: 44%;" title="Drag horizontally to measure camper length / stations">
+            <div class="caliper-v-line"></div>
+            <span id="caliper-v-label" class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 font-bold text-[10px] whitespace-nowrap shadow">
+              STA: 11'-6" FROM HITCH
+            </span>
+          </div>
+
+          <!-- PRIMARY 2004 SPORTSTER TOY HAULER SVG SCHEMATIC (960 x 440 VIEWBOX) -->
+          <!-- Scale mapping: Shell X from 110 to 890 (780px = 26'-0" => 30px per foot) -->
+          <!-- Shell Y from 85 to 340 (255px = 8'-6" => 30px per foot) -->
+          <svg id="camper-svg" viewBox="0 0 960 440" class="w-full h-auto block">
+            <defs>
+              <!-- Red Demolition Diagonal Hatch -->
+              <pattern id="demoHatch" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="10" stroke="#f43f5e" stroke-width="1.5" stroke-opacity="0.45" />
+              </pattern>
+              <!-- Amber Flood / Water Damage Hatch -->
+              <pattern id="waterDamageHatch" width="12" height="12" patternTransform="rotate(-45 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="12" stroke="#f59e0b" stroke-width="1.8" stroke-opacity="0.55" />
+                <circle cx="6" cy="6" r="1" fill="#fbbf24" opacity="0.6"/>
+              </pattern>
+              <!-- Marine 3/4" Plywood Grain Pattern -->
+              <pattern id="plywoodGrid" width="60" height="30" patternUnits="userSpaceOnUse">
+                <rect width="60" height="30" fill="none" stroke="#38bdf8" stroke-width="0.6" stroke-opacity="0.28"/>
+                <line x1="0" y1="15" x2="60" y2="15" stroke="#38bdf8" stroke-width="0.4" stroke-dasharray="3 3" stroke-opacity="0.25"/>
+              </pattern>
+              <!-- Phase 2 Emerald Build-out Hatch -->
+              <pattern id="phase2Hatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="8" stroke="#10b981" stroke-width="1.2" stroke-opacity="0.35" />
+              </pattern>
+            </defs>
+
+            <!-- OVERALL DIMENSION CALLOUTS (TOP & LEFT) -->
+            <!-- Total Length 26'-0" -->
+            <g stroke="#38bdf8" stroke-width="1" opacity="0.85">
+              <line x1="110" y1="42" x2="890" y2="42"/>
+              <line x1="110" y1="34" x2="110" y2="52"/>
+              <line x1="890" y1="34" x2="890" y2="52"/>
+            </g>
+            <rect x="425" y="31" width="150" height="20" fill="#071021"/>
+            <text x="500" y="45" fill="#7dd3fc" font-size="11" font-weight="bold" text-anchor="middle">26'-0" BOX LENGTH</text>
+
+            <!-- Zone Span Callouts -->
+            <g font-size="9.5" fill="#7dd3fc" text-anchor="middle" opacity="0.9">
+              <text x="200" y="72">ZONE 01: FRONT BED (6'-0")</text>
+              <text x="435" y="72">ZONE 02: GALLEY / WORKSTATION (9'-6")</text>
+              <text x="735" y="72">ZONE 03: TOY HAULER GARAGE (10'-6")</text>
+            </g>
+
+            <!-- Total Width 8'-6" (Right Side) -->
+            <g stroke="#38bdf8" stroke-width="1" opacity="0.85">
+              <line x1="922" y1="85" x2="922" y2="340"/>
+              <line x1="914" y1="85" x2="930" y2="85"/>
+              <line x1="914" y1="340" x2="930" y2="340"/>
+            </g>
+            <text x="942" y="212" fill="#7dd3fc" font-size="10.5" font-weight="bold" text-anchor="middle" transform="rotate(90 942 212)">8'-6" EXTERIOR WIDTH</text>
+
+            <!-- A-FRAME TONGUE & HITCH (LEFT) -->
+            <g stroke="#38bdf8" stroke-width="2" fill="rgba(56,189,248,0.06)">
+              <polygon points="32,212.5 110,155 110,270"/>
+              <circle cx="26" cy="212.5" r="7" fill="#071021" stroke="#7dd3fc" stroke-width="2"/>
+              <rect x="58" y="198" width="28" height="29" fill="#071021" stroke="#38bdf8" stroke-width="1.2"/>
+            </g>
+            <text x="58" y="290" fill="#38bdf8" font-size="9.5" text-anchor="middle">A-FRAME</text>
+            <text x="58" y="302" fill="#38bdf8" font-size="9.5" text-anchor="middle">HITCH</text>
+
+            <!-- =============================================================== -->
+            <!-- BASE CHASSIS & STRIPPED SHELL LAYER (ALWAYS PRESENT UNDERNEATH) -->
+            <!-- =============================================================== -->
+            <g id="layer-base-shell">
+              <!-- Outer Aluminum/Wood Framing Shell -->
+              <rect x="110" y="85" width="780" height="255" rx="4" fill="#09162c" stroke="#7dd3fc" stroke-width="3"/>
+              <!-- Inner Wall Stud Cavity Line (2" Wall Thickness) -->
+              <rect x="117" y="92" width="766" height="241" fill="url(#plywoodGrid)" stroke="#38bdf8" stroke-width="1" stroke-dasharray="6 3"/>
+
+              <!-- Bare Wall Stud Tick Marks (16" O.C. -> every 40px) -->
+              <g stroke="#7dd3fc" stroke-width="2" opacity="0.75">
+                <!-- Top Wall Studs -->
+                <line x1="150" y1="85" x2="150" y2="92"/><line x1="190" y1="85" x2="190" y2="92"/>
+                <line x1="230" y1="85" x2="230" y2="92"/><line x1="270" y1="85" x2="270" y2="92"/>
+                <line x1="310" y1="85" x2="310" y2="92"/><line x1="350" y1="85" x2="350" y2="92"/>
+                <line x1="390" y1="85" x2="390" y2="92"/><line x1="430" y1="85" x2="430" y2="92"/>
+                <line x1="470" y1="85" x2="470" y2="92"/><line x1="510" y1="85" x2="510" y2="92"/>
+                <line x1="550" y1="85" x2="550" y2="92"/><line x1="590" y1="85" x2="590" y2="92"/>
+                <line x1="630" y1="85" x2="630" y2="92"/><line x1="670" y1="85" x2="670" y2="92"/>
+                <line x1="710" y1="85" x2="710" y2="92"/><line x1="750" y1="85" x2="750" y2="92"/>
+                <line x1="790" y1="85" x2="790" y2="92"/><line x1="830" y1="85" x2="830" y2="92"/>
+                <!-- Bottom Wall Studs -->
+                <line x1="150" y1="333" x2="150" y2="340"/><line x1="190" y1="333" x2="190" y2="340"/>
+                <line x1="230" y1="333" x2="230" y2="340"/><line x1="350" y1="333" x2="350" y2="340"/>
+                <line x1="390" y1="333" x2="390" y2="340"/><line x1="430" y1="333" x2="430" y2="340"/>
+                <line x1="470" y1="333" x2="470" y2="340"/><line x1="510" y1="333" x2="510" y2="340"/>
+                <line x1="550" y1="333" x2="550" y2="340"/><line x1="590" y1="333" x2="590" y2="340"/>
+                <line x1="630" y1="333" x2="630" y2="340"/><line x1="670" y1="333" x2="670" y2="340"/>
+                <line x1="710" y1="333" x2="710" y2="340"/><line x1="750" y1="333" x2="750" y2="340"/>
+                <line x1="790" y1="333" x2="790" y2="340"/><line x1="830" y1="333" x2="830" y2="340"/>
+              </g>
+
+              <!-- Tandem Axle Wheel Well Housings (9" Intrusion) -->
+              <rect x="445" y="92" width="110" height="24" fill="#0f2342" stroke="#38bdf8" stroke-width="1.5"/>
+              <text x="500" y="107" fill="#7dd3fc" font-size="8.5" text-anchor="middle">9" WHEEL WELL (ROADSIDE)</text>
+
+              <rect x="445" y="309" width="110" height="24" fill="#0f2342" stroke="#38bdf8" stroke-width="1.5"/>
+              <text x="500" y="324" fill="#7dd3fc" font-size="8.5" text-anchor="middle">9" WHEEL WELL (CURBSIDE)</text>
+
+              <!-- Main Curbsde Entry Door (30" Wide, 18" Left of Workstation Desk) -->
+              <g>
+                <rect x="255" y="332" width="75" height="10" fill="#071021" stroke="#38bdf8" stroke-width="2"/>
+                <path d="M 255 340 A 75 75 0 0 0 330 415 L 330 340" fill="rgba(56,189,248,0.08)" stroke="#38bdf8" stroke-width="1" stroke-dasharray="4 3"/>
+                <text x="292" y="356" fill="#7dd3fc" font-size="9.5" font-weight="bold" text-anchor="middle">ENTRY DOOR</text>
+              </g>
+
+              <!-- Zone Divider Reference Lines -->
+              <line x1="290" y1="92" x2="290" y2="333" stroke="#38bdf8" stroke-width="1" stroke-dasharray="3 5" opacity="0.45"/>
+              <line x1="580" y1="92" x2="580" y2="333" stroke="#38bdf8" stroke-width="1" stroke-dasharray="3 5" opacity="0.45"/>
+            </g>
+
+            <!-- =============================================================== -->
+            <!-- ZONE 03: SUBFLOOR 3/4" MARINE PLYWOOD REPLACEMENT ZONE          -->
+            <!-- =============================================================== -->
+            <g id="zone-subfloor" class="zone-group" onclick="selectZone('subfloor')">
+              <!-- Subfloor Replacement Sheet Outlines (4x8 sheets) -->
+              <rect x="330" y="94" width="550" height="237" fill="rgba(56,189,248,0.03)" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="8 4"/>
+              <!-- Flood-Damaged Subfloor Hotspot in Rear Toy Hauler & Mid Entry -->
+              <rect id="subfloor-damage-rect" x="580" y="96" width="300" height="233" fill="url(#waterDamageHatch)" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="6 3"/>
+              <rect x="335" y="245" width="110" height="84" fill="url(#waterDamageHatch)" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5 3"/>
+
+              <g pointer-events="none">
+                <rect x="615" y="196" width="230" height="34" rx="3" fill="#071021" stroke="#f59e0b" stroke-width="1"/>
+                <text x="730" y="211" fill="#fcd34d" font-size="10" font-weight="bold" text-anchor="middle">3/4" SUBFLOOR REPLACEMENT</text>
+                <text x="730" y="223" fill="#fde68a" font-size="8.5" text-anchor="middle">FLOOD ROT &amp; DELAMINATION ZONE</text>
+              </g>
+            </g>
+
+            <!-- =============================================================== -->
+            <!-- ZONE 01: FRONT CAB / MASTER BED WOOD FRAME STRIPPING            -->
+            <!-- =============================================================== -->
+            <g id="zone-front-bed" class="zone-group" onclick="selectZone('front-bed')">
+              <!-- Stripped Base Framing (Always subtle) -->
+              <rect x="120" y="95" width="168" height="235" fill="rgba(56,189,248,0.04)" stroke="#38bdf8" stroke-width="1"/>
+              <!-- Demo Overlay: Factory Queen Bed Box & Overhead Cabinets -->
+              <g class="layer-demo-element">
+                <rect x="122" y="102" width="158" height="190" fill="url(#demoHatch)" stroke="#f43f5e" stroke-width="2" stroke-dasharray="6 3" class="demo-hatch-line"/>
+                <rect x="122" y="295" width="68" height="34" fill="url(#demoHatch)" stroke="#f43f5e" stroke-width="1.5"/>
+                <rect x="128" y="155" width="146" height="44" rx="2" fill="#071021" stroke="#f43f5e" stroke-width="1"/>
+                <text x="201" y="174" fill="#fda4af" font-size="10" font-weight="bold" text-anchor="middle">[DEMO] FRONT BED BOX</text>
+                <text x="201" y="188" fill="#fecdd3" font-size="8.5" text-anchor="middle">STRIP WOOD FRAME + WARDROBE</text>
+              </g>
+              <!-- Shell View Label -->
+              <g class="layer-shell-element hidden">
+                <text x="204" y="210" fill="#7dd3fc" font-size="10" font-weight="bold" text-anchor="middle">BARE FRONT BULKHEAD</text>
+                <text x="204" y="224" fill="#38bdf8" font-size="8.5" text-anchor="middle">FRAMING INSPECTED // CLEAN</text>
+              </g>
+            </g>
+
+            <!-- =============================================================== -->
+            <!-- ZONE 02: MID-GALLEY / COUCH & DINETTE REMOVAL                   -->
+            <!-- =============================================================== -->
+            <g id="zone-mid-demo" class="zone-group" onclick="selectZone('mid-demo')">
+              <!-- Demo Overlay: OEM Couch + Dinette Booths + Galley Counter -->
+              <g class="layer-demo-element">
+                <!-- Roadside Dinette Booths + Table -->
+                <rect x="305" y="96" width="135" height="68" fill="url(#demoHatch)" stroke="#f43f5e" stroke-width="2" stroke-dasharray="6 3" class="demo-hatch-line"/>
+                <rect x="352" y="102" width="42" height="56" fill="#09162c" stroke="#f43f5e" stroke-width="1.2"/>
+                <text x="373" y="128" fill="#fda4af" font-size="9.5" font-weight="bold" text-anchor="middle">[DEMO] DINETTE</text>
+                <text x="373" y="140" fill="#fecdd3" font-size="8" text-anchor="middle">BOOTH + TABLE</text>
+
+                <!-- Curbside OEM Jackknife Couch (Right of Entry Door) -->
+                <rect x="345" y="256" width="175" height="64" fill="url(#demoHatch)" stroke="#f43f5e" stroke-width="2" stroke-dasharray="6 3" class="demo-hatch-line"/>
+                <rect x="368" y="272" width="130" height="32" rx="2" fill="#071021" stroke="#f43f5e" stroke-width="1"/>
+                <text x="433" y="286" fill="#fda4af" font-size="9.5" font-weight="bold" text-anchor="middle">[DEMO] OEM COUCH</text>
+                <text x="433" y="298" fill="#fecdd3" font-size="8" text-anchor="middle">FULL REMOVAL TO WALL STUDS</text>
+
+                <!-- Old Galley Countertop Stub -->
+                <rect x="455" y="118" width="115" height="44" fill="url(#demoHatch)" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="4 3"/>
+                <text x="512" y="143" fill="#fda4af" font-size="8.5" text-anchor="middle">[DEMO] OLD GALLEY</text>
+              </g>
+            </g>
+
+            <!-- =============================================================== -->
+            <!-- PHASE 2 BUILD-OUT GHOST OVERLAY (WORKSTATION DESK + RACKS)      -->
+            <!-- =============================================================== -->
+            <g id="layer-phase2-overlay" class="hidden">
+              <!-- 18" Gap Callout Right of Entry Door -->
+              <line x1="330" y1="295" x2="375" y2="295" stroke="#34d399" stroke-width="1.5"/>
+              <text x="352" y="288" fill="#6ee7b7" font-size="8.5" font-weight="bold" text-anchor="middle">18" GAP</text>
+
+              <!-- 58" x 24" Custom Pine Workstation Desk (Curbside, 18" right of door) -->
+              <rect x="375" y="268" width="145" height="60" fill="url(#phase2Hatch)" stroke="#10b981" stroke-width="2.2"/>
+              <rect x="385" y="282" width="125" height="32" rx="2" fill="#071021" stroke="#10b981" stroke-width="1"/>
+              <text x="447" y="296" fill="#6ee7b7" font-size="9" font-weight="bold" text-anchor="middle">58"×24" PINE DESK</text>
+              <text x="447" y="308" fill="#a7f3d0" font-size="8" text-anchor="middle">36" SPACER + WHEEL WELL NOTCH</text>
+
+              <!-- Ergonomic Desk Chair Circle -->
+              <circle cx="447" cy="242" r="18" fill="rgba(16,185,129,0.12)" stroke="#34d399" stroke-width="1.5" stroke-dasharray="4 2"/>
+              <text x="447" y="245" fill="#6ee7b7" font-size="8" text-anchor="middle">CHAIR</text>
+
+              <!-- Mean Well 5V/12V PSU + Rocker Switch Board -->
+              <rect x="526" y="276" width="46" height="52" fill="rgba(56,189,248,0.18)" stroke="#38bdf8" stroke-width="1.8"/>
+              <text x="549" y="298" fill="#7dd3fc" font-size="7.5" font-weight="bold" text-anchor="middle">PSU</text>
+              <text x="549" y="309" fill="#bae6fd" font-size="7" text-anchor="middle">5V/12V</text>
+
+              <!-- TrueNAS / UPS Homelab Rack Bay (Roadside Mid) -->
+              <rect x="320" y="96" width="110" height="52" fill="url(#phase2Hatch)" stroke="#10b981" stroke-width="2"/>
+              <text x="375" y="120" fill="#6ee7b7" font-size="8.5" font-weight="bold" text-anchor="middle">NAS + UPS RACK</text>
+              <text x="375" y="132" fill="#a7f3d0" font-size="7.5" text-anchor="middle">140W PD + WLED NODE</text>
+
+              <!-- Phase 2 Elevated Bed / Modular Garage -->
+              <rect x="122" y="98" width="160" height="185" fill="url(#phase2Hatch)" stroke="#10b981" stroke-width="1.8" stroke-dasharray="6 3"/>
+              <text x="202" y="190" fill="#6ee7b7" font-size="9.5" font-weight="bold" text-anchor="middle">NEW FRAMED BED DECK</text>
+            </g>
+
+            <!-- =============================================================== -->
+            <!-- ZONE 04: REAR TOY HAULER GARAGE & RAMP DOOR SEAL / LEAK ZONE    -->
+            <!-- =============================================================== -->
+            <g id="zone-rear-ramp" class="zone-group" onclick="selectZone('rear-ramp')">
+              <!-- Rear Toy Hauler Ramp Door Hinge & Perimeter Seal -->
+              <rect x="878" y="95" width="16" height="235" fill="rgba(244,63,94,0.28)" stroke="#f43f5e" stroke-width="2"/>
+              <!-- Deployed Ramp Door Dotted Footprint -->
+              <polygon points="894,95 952,105 952,320 894,330" fill="rgba(56,189,248,0.05)" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="4 4"/>
+              <text x="866" y="212" fill="#fda4af" font-size="9.5" font-weight="bold" text-anchor="middle" transform="rotate(-90 866 212)">REAR RAMP SEAL &amp; SILL LEAK</text>
+
+              <!-- Tie-Down D-Ring Markers in Toy Hauler Floor -->
+              <g fill="#071021" stroke="#7dd3fc" stroke-width="1.5">
+                <circle cx="615" cy="120" r="4"/><circle cx="845" cy="120" r="4"/>
+                <circle cx="615" cy="305" r="4"/><circle cx="845" cy="305" r="4"/>
+              </g>
+            </g>
+
+            <!-- =============================================================== -->
+            <!-- ZONE 05: ROOF SEAM, VENTS & EXTERIOR ENVELOPE OVERLAY           -->
+            <!-- =============================================================== -->
+            <g id="zone-roof-envelope" class="zone-group" onclick="selectZone('roof-envelope')">
+              <!-- Roof Perimeter Cap & Seam Dashed Envelope -->
+              <rect x="113" y="88" width="774" height="249" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="12 4"/>
+              <!-- Roof Penetrations (AC Unit, Bath Vent, Plumbing Stack) -->
+              <rect x="465" y="178" width="68" height="68" rx="4" fill="rgba(56,189,248,0.12)" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="5 3"/>
+              <text x="499" y="210" fill="#7dd3fc" font-size="9" font-weight="bold" text-anchor="middle">ROOF AC</text>
+              <text x="499" y="222" fill="#bae6fd" font-size="8" text-anchor="middle">GASKET SEAL</text>
+
+              <rect x="705" y="130" width="36" height="36" rx="3" fill="rgba(245,158,11,0.18)" stroke="#f59e0b" stroke-width="1.6"/>
+              <text x="723" y="151" fill="#fcd34d" font-size="8" font-weight="bold" text-anchor="middle">VENT</text>
+
+              <!-- Clickable Roof Seam Pill Badge on Top Rail -->
+              <rect x="610" y="76" width="195" height="20" rx="3" fill="#0b1830" stroke="#38bdf8" stroke-width="1.4"/>
+              <text x="707" y="89" fill="#7dd3fc" font-size="9" font-weight="bold" text-anchor="middle">⚡ ROOF MEMBRANE &amp; CAP SEAMS</text>
+            </g>
+
+            <!-- =============================================================== -->
+            <!-- POINT-TO-POINT TAPE MEASURE SVG OVERLAY                         -->
+            <!-- =============================================================== -->
+            <g id="tape-svg-group" class="hidden" pointer-events="none">
+              <line id="tape-line" x1="0" y1="0" x2="0" y2="0" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="6 3"/>
+              <circle id="tape-p1" cx="0" cy="0" r="5" fill="#fbbf24" stroke="#071021" stroke-width="1.5"/>
+              <circle id="tape-p2" cx="0" cy="0" r="5" fill="#fbbf24" stroke="#071021" stroke-width="1.5"/>
+              <rect id="tape-label-bg" x="0" y="0" width="96" height="20" rx="3" fill="#fbbf24"/>
+              <text id="tape-label-text" x="0" y="0" fill="#071021" font-size="10.5" font-weight="bold" text-anchor="middle">0'-0"</text>
+            </g>
+
+            <!-- BOTTOM LEGEND STRIP INSIDE SVG -->
+            <g transform="translate(110, 382)" font-size="9.5">
+              <rect x="0" y="0" width="14" height="14" fill="url(#demoHatch)" stroke="#f43f5e" stroke-width="1.5"/>
+              <text x="20" y="11" fill="#fda4af">INTERIOR DEMO REMOVAL</text>
+
+              <rect x="185" y="0" width="14" height="14" fill="url(#waterDamageHatch)" stroke="#f59e0b" stroke-width="1.5"/>
+              <text x="205" y="11" fill="#fcd34d">FLOOD-DAMAGED 3/4" SUBFLOOR</text>
+
+              <rect x="405" y="0" width="14" height="14" fill="url(#plywoodGrid)" stroke="#38bdf8" stroke-width="1.5"/>
+              <text x="425" y="11" fill="#7dd3fc">BARE STUDS / MARINE PLYWOOD</text>
+
+              <rect x="615" y="0" width="14" height="14" fill="url(#phase2Hatch)" stroke="#10b981" stroke-width="1.5"/>
+              <text x="635" y="11" fill="#6ee7b7">PHASE 2 REBUILD</text>
+            </g>
+          </svg>
+        </div>
+
+        <!-- QUICK ZONE SELECTOR PILLS BELOW FLOORPLAN -->
+        <div class="flex flex-wrap items-center gap-1.5 pt-1">
+          <span class="text-[11px] text-sky-400 font-bold mr-1">INSPECT ZONE:</span>
+          <button onclick="selectZone('front-bed')" id="pill-front-bed" class="zone-pill px-2.5 py-1 rounded text-[11px] border border-sky-500/40 bg-sky-950/40 text-sky-200 hover:border-sky-300 transition">
+            01. FRONT BED FRAME
+          </button>
+          <button onclick="selectZone('mid-demo')" id="pill-mid-demo" class="zone-pill px-2.5 py-1 rounded text-[11px] border border-sky-400 bg-sky-500/25 text-white font-semibold transition">
+            02. COUCH &amp; DINETTE DEMO
+          </button>
+          <button onclick="selectZone('subfloor')" id="pill-subfloor" class="zone-pill px-2.5 py-1 rounded text-[11px] border border-sky-500/40 bg-sky-950/40 text-sky-200 hover:border-sky-300 transition">
+            03. 3/4" SUBFLOOR REPLACEMENT
+          </button>
+          <button onclick="selectZone('rear-ramp')" id="pill-rear-ramp" class="zone-pill px-2.5 py-1 rounded text-[11px] border border-sky-500/40 bg-sky-950/40 text-sky-200 hover:border-sky-300 transition">
+            04. REAR RAMP &amp; LEAK ZONE
+          </button>
+          <button onclick="selectZone('roof-envelope')" id="pill-roof-envelope" class="zone-pill px-2.5 py-1 rounded text-[11px] border border-sky-500/40 bg-sky-950/40 text-sky-200 hover:border-sky-300 transition">
+            05. ROOF SEAMS &amp; ENVELOPE
+          </button>
+        </div>
+      </div>
+
+      <!-- RIGHT: ZONE INSPECTOR & DEMOLITION / REBUILD CHECKLIST (4 COLS ON XL) -->
+      <aside class="xl:col-span-4 cad-box rounded p-4 space-y-4">
+        <!-- Inspector Header -->
+        <div class="border-b border-sky-500/30 pb-3 flex items-start justify-between gap-2">
+          <div>
+            <div id="insp-zone-code" class="text-[11px] font-bold text-amber-400 tracking-wider">ZONE 02 // MID-GALLEY &amp; LIVING</div>
+            <h2 id="insp-zone-title" class="text-base font-bold text-white mt-0.5">Couch &amp; Dinette Complete Removal</h2>
+          </div>
+          <span id="insp-zone-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 border border-rose-400/50 text-rose-200 shrink-0">
+            DEMO PHASE
+          </span>
+        </div>
+
+        <!-- Structural Dimensions & Status Grid -->
+        <div class="grid grid-cols-2 gap-2 text-[11px]">
+          <div class="rounded border border-sky-500/25 bg-[#071122] p-2">
+            <div class="text-sky-400/80 text-[10px]">ZONE FOOTPRINT</div>
+            <div id="insp-footprint" class="font-bold text-white">9'-6" × 8'-0"</div>
+          </div>
+          <div class="rounded border border-sky-500/25 bg-[#071122] p-2">
+            <div class="text-sky-400/80 text-[10px]">PHASE 2 TARGET</div>
+            <div id="insp-target" class="font-bold text-emerald-300">58"×24" Desk + PSU</div>
+          </div>
+        </div>
+
+        <!-- Scope of Removal / Strip-Out -->
+        <div class="space-y-1">
+          <div class="text-[11px] font-bold text-rose-300 uppercase tracking-wider">1. Scope of Removal / Strip-Out</div>
+          <p id="insp-demo-scope" class="text-xs text-sky-100/85 bg-[#071122] border border-sky-500/20 rounded p-2.5 leading-relaxed">
+            Unbolt and extract OEM jackknife couch, factory dinette booths, center pedestal table, and water-swollen particleboard galley base down to bare wall studs and subfloor deck.
+          </p>
+        </div>
+
+        <!-- Structural Inspection & Prep -->
+        <div class="space-y-1">
+          <div class="text-[11px] font-bold text-sky-300 uppercase tracking-wider">2. Structural Inspection &amp; Prep</div>
+          <p id="insp-prep-scope" class="text-xs text-sky-100/85 bg-[#071122] border border-sky-500/20 rounded p-2.5 leading-relaxed">
+            Inspect lower curbside/roadside wall plates for moisture wicking; sister compromised 2×2 studs and verify 9" wheel well housing structural integrity before setting new subfloor.
+          </p>
+        </div>
+
+        <!-- Material & Fastener Callouts -->
+        <div class="space-y-1.5">
+          <div class="text-[11px] font-bold text-amber-300 uppercase tracking-wider">3. Material &amp; Fastener Callouts</div>
+          <ul id="insp-materials" class="space-y-1 text-xs text-sky-100/90 bg-[#071122] border border-sky-500/20 rounded p-2.5">
+            <!-- Populated dynamically -->
+          </ul>
+        </div>
+
+        <!-- Interactive Demolition & Prep Checklist -->
+        <div class="space-y-2 pt-1 border-t border-sky-500/30">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-emerald-300 uppercase tracking-wider">4. Zone Strip-Out Checklist</span>
+            <span id="zone-checklist-count" class="text-[11px] text-sky-300 font-bold">1/3 COMPLETE</span>
+          </div>
+          <div id="insp-checklist" class="space-y-1.5">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- BOTTOM BILL OF MATERIALS (BOM) & STRUCTURAL SCHEDULE STRIP -->
+    <div class="cad-box rounded p-4">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-sky-500/30 pb-2.5 mb-3">
+        <div class="text-xs font-bold text-sky-300 tracking-wider uppercase">
+          PHASE 1 STRUCTURAL SHELL &amp; ENVELOPE SCHEDULE // 2004 SPORTSTER TOY HAULER
+        </div>
+        <div class="text-[11px] text-sky-400">ALL FASTENERS RATED FOR HIGH-VIBRATION RV CHASSIS</div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+        <div class="rounded border border-sky-500/25 bg-[#071122] p-3">
+          <div class="text-amber-300 font-bold mb-1">SUBFLOOR DECKING</div>
+          <div class="text-white font-semibold">3/4" Marine / Exterior T&amp;G Plywood</div>
+          <p class="text-[11px] text-sky-200/70 mt-1">Replaces flood-damaged OEM decking in garage &amp; mid-galley; sealed edges + subfloor adhesive.</p>
+        </div>
+        <div class="rounded border border-sky-500/25 bg-[#071122] p-3">
+          <div class="text-rose-300 font-bold mb-1">INTERIOR DEMO TARGETS</div>
+          <div class="text-white font-semibold">Bed Frame, Couch, Dinette &amp; Trim</div>
+          <p class="text-[11px] text-sky-200/70 mt-1">100% gut to bare aluminum/wood framing so all 12V/120V runs and insulation start clean.</p>
+        </div>
+        <div class="rounded border border-sky-500/25 bg-[#071122] p-3">
+          <div class="text-sky-300 font-bold mb-1">REAR RAMP &amp; SILL ENVELOPE</div>
+          <div class="text-white font-semibold">EPDM Compression Gasket + Sill Pan</div>
+          <p class="text-[11px] text-sky-200/70 mt-1">Eliminates rear ramp door water intrusion that caused original toy hauler subfloor rot.</p>
+        </div>
+        <div class="rounded border border-sky-500/25 bg-[#071122] p-3">
+          <div class="text-emerald-300 font-bold mb-1">ROOF LEAK MITIGATION</div>
+          <div class="text-white font-semibold">Self-Leveling Lap Sealant + Butyl Tape</div>
+          <p class="text-[11px] text-sky-200/70 mt-1">Full strip &amp; reseal of roof perimeter rails, AC gasket, and plumbing/roof vents.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 3: TAB 02 [SHEET-02 // POWER-HOMELAB-RACK-CONFIG]                -->
+  <!-- ===================================================================== -->
+  <section id="view-sheet02" class="hidden max-w-[1600px] w-full mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-4 flex-1">
+
+    <!-- SHEET 02 ARCHITECTURAL TITLE BLOCK HEADER -->
+    <div class="cad-box rounded p-3.5 sm:p-4">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-center">
+        <div class="lg:col-span-5 space-y-1">
+          <div class="flex flex-wrap items-center gap-2 text-[11px] text-sky-400">
+            <span class="font-bold">DEXTERSLABS.NET // SHEET-02 // POWER-HOMELAB-RACK-CONFIG</span>
+            <span>|</span>
+            <span id="rack-title-enclosure-tag">APC NETSHELTER SX 40U/42U</span>
+          </div>
+          <h1 class="text-base sm:text-xl font-bold text-white tracking-tight">
+            40U / 42U POWER &amp; HOMELAB RACK ELEVATION CONFIGURATOR
+          </h1>
+        </div>
+
+        <!-- Live Engineering Telemetry Readouts -->
+        <div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-5 gap-2 text-[11px]">
+          <div class="rounded border border-sky-500/30 bg-[#071122] px-2.5 py-1.5">
+            <div class="text-sky-400/80 text-[10px]">RACK OCCUPANCY</div>
+            <div id="telem-ru" class="font-bold text-white">0U / 40U (40U FREE)</div>
+          </div>
+          <div class="rounded border border-sky-500/30 bg-[#071122] px-2.5 py-1.5">
+            <div class="text-sky-400/80 text-[10px]">EST. TOTAL WEIGHT</div>
+            <div id="telem-weight" class="font-bold text-sky-300">0 lbs / 3000 lb</div>
+          </div>
+          <div class="rounded border border-sky-500/30 bg-[#071122] px-2.5 py-1.5">
+            <div class="text-sky-400/80 text-[10px]">CONT / PEAK LOAD</div>
+            <div id="telem-watts" class="font-bold text-amber-300">0W / 0W</div>
+          </div>
+          <div class="rounded border border-sky-500/30 bg-[#071122] px-2.5 py-1.5">
+            <div class="text-sky-400/80 text-[10px]">UPS RUNTIME EST.</div>
+            <div id="telem-runtime" class="font-bold text-emerald-300">-- MIN (NO UPS)</div>
+          </div>
+          <div class="rounded border border-sky-500/30 bg-[#071122] px-2.5 py-1.5 col-span-2 sm:col-span-1">
+            <div class="text-sky-400/80 text-[10px]">120V CIRCUIT LOAD</div>
+            <div id="telem-breaker" class="font-bold text-white">0% (15A) / 0% (20A)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RACK ENCLOSURE SELECTOR, PRESET LOADOUTS & CAD CONTROLS -->
+    <div class="cad-box rounded p-3 space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-sky-500/25 pb-2.5">
+        <!-- Enclosure Frame Selector -->
+        <div class="flex flex-wrap items-center gap-2 flex-1 min-w-[280px]">
+          <label for="enclosure-select" class="text-[11px] font-bold text-sky-400 shrink-0">CAGE / ENCLOSURE:</label>
+          <select id="enclosure-select" onchange="changeEnclosure(this.value)" class="rounded bg-[#071021] border border-sky-400/60 px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-300 max-w-full">
+            <!-- Populated by JS -->
+          </select>
+        </div>
+
+        <!-- Rack View & CAD Tools -->
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button onclick="toggleRackDepthView()" id="btn-rack-face" class="px-2.5 py-1.5 rounded text-xs font-semibold border border-sky-400 bg-sky-500/20 text-white transition">
+            VIEW: FRONT ELEVATION
+          </button>
+          <button onclick="toggleRackCageDoor()" id="btn-rack-door" class="px-2.5 py-1.5 rounded text-xs font-semibold border border-sky-500/40 bg-sky-950/40 text-sky-200 hover:border-sky-300 transition">
+            CAGE DOORS: OPEN (X-RAY)
+          </button>
+          <button onclick="toggleRackCalipers()" id="btn-rack-calipers" class="px-2.5 py-1.5 rounded text-xs font-semibold border border-amber-400 bg-amber-500/20 text-amber-200 transition">
+            ⌖ CALIPERS: ON
+          </button>
+          <button onclick="toggleRackTape()" id="btn-rack-tape" class="px-2.5 py-1.5 rounded text-xs font-semibold border border-sky-500/40 bg-sky-950/40 text-sky-200 hover:border-sky-300 transition">
+            📏 TAPE: OFF
+          </button>
+          <button onclick="openRackBomModal()" class="px-3 py-1.5 rounded text-xs font-bold border border-emerald-400 bg-emerald-500/20 text-emerald-200 hover:bg-emerald-500/30 transition">
+            ⎙ EXPORT BOM / JSON
+          </button>
+        </div>
+      </div>
+
+      <!-- 1-Click Loadout Preset Templates -->
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex flex-wrap items-center gap-1.5">
+          <span class="text-[11px] font-bold text-amber-400 mr-1">1-CLICK LOADOUTS:</span>
+          <button onclick="applyRackPreset('dexter_hybrid')" class="px-2.5 py-1 rounded text-[11px] font-semibold border border-emerald-400/60 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 transition">
+            ★ DEXTER'S HOMELAB + 12V/5V BENCH HYBRID
+          </button>
+          <button onclick="applyRackPreset('enterprise_10g')" class="px-2.5 py-1 rounded text-[11px] border border-sky-500/40 bg-sky-950/50 hover:border-sky-300 text-sky-200 transition">
+            ENTERPRISE 10G/25G CORE + DOUBLE-CONVERSION UPS
+          </button>
+          <button onclick="applyRackPreset('camper_offgrid')" class="px-2.5 py-1 rounded text-[11px] border border-sky-500/40 bg-sky-950/50 hover:border-sky-300 text-sky-200 transition">
+            OFF-GRID CAMPER / TOY HAULER LIFEPO4 + PURE SINE
+          </button>
+          <button onclick="applyRackPreset('clear')" class="px-2.5 py-1 rounded text-[11px] border border-rose-500/40 bg-rose-950/30 hover:border-rose-400 text-rose-200 transition">
+            ✕ CLEAR RACK
+          </button>
+        </div>
+
+        <div id="rack-enclosure-specs-bar" class="text-[11px] text-sky-300/80">
+          <!-- Enclosure quick dims -->
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN RACK WORKSPACE: LEFT HARDWARE CATALOG (5 COLS) + CENTER ELEVATION (4 COLS) + RIGHT INSPECTOR (3 COLS) -->
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
+
+      <!-- COLUMN 1: CATEGORIZED HARDWARE & POWER CATALOG (5 COLS) -->
+      <div class="xl:col-span-5 cad-box rounded p-3.5 space-y-3">
+        <div class="flex items-center justify-between border-b border-sky-500/30 pb-2">
+          <div>
+            <div class="text-[11px] font-bold text-sky-400">HARDWARE &amp; POWER CATALOG</div>
+            <div class="text-xs text-sky-100/75">Select gear to mount into target U-slot</div>
+          </div>
+          <div class="flex items-center gap-1.5 text-[11px]">
+            <label for="target-u-select" class="text-amber-300 font-bold">TARGET U:</label>
+            <select id="target-u-select" class="rounded bg-[#071021] border border-amber-400/60 px-2 py-1 text-amber-200 font-bold focus:outline-none">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Search & Category Filter Tabs -->
+        <div class="space-y-2">
+          <input id="catalog-search" type="text" oninput="renderHardwareCatalog()" placeholder="Filter Ubiquiti, MikroTik, CyberPower, Furman, pull-out shelf, UPS..." class="w-full rounded bg-[#071021] border border-sky-500/40 px-3 py-1.5 text-xs text-white placeholder-sky-400/50 focus:outline-none focus:border-sky-300"/>
+
+          <div id="catalog-cat-tabs" class="flex flex-wrap gap-1">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Scrollable Hardware Items List -->
+        <div id="hardware-catalog-list" class="space-y-2 max-h-[690px] overflow-y-auto pr-1">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- COLUMN 2: INTERACTIVE 40U / 42U / 24U RACK ELEVATION BLUEPRINT (4 COLS) -->
+      <div class="xl:col-span-4 cad-box rounded p-3.5 space-y-2.5">
+        <div class="flex items-center justify-between text-[11px] border-b border-sky-500/25 pb-2">
+          <span class="font-bold text-sky-300" id="rack-elevation-header">40U FULL CAGE // FRONT ELEVATION</span>
+          <span id="rack-cursor-readout" class="text-amber-300 font-semibold">U-SLOT: --</span>
+        </div>
+
+        <div id="rack-tape-pill" class="hidden px-2.5 py-1 rounded bg-amber-500/20 border border-amber-400 text-amber-200 text-[11px] font-bold text-center">
+          TAPE: CLICK START POINT ON RACK CHASSIS
+        </div>
+
+        <!-- RACK ELEVATION CAD STAGE WITH DRAGGABLE CALIPERS -->
+        <div id="rack-blueprint-stage" class="blueprint-stage relative rounded border border-sky-500/50 p-2 sm:p-3 overflow-hidden select-none">
+
+          <!-- Horizontal Caliper Guide -->
+          <div id="rack-caliper-h" class="caliper-h" style="top: 32%;" title="Drag vertically to inspect U-slot elevation height">
+            <div class="caliper-h-line"></div>
+            <span id="rack-caliper-h-label" class="absolute right-2 -top-5 px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 font-bold text-[10px] shadow">
+              ELEV: U28 (49.0" AFF)
+            </span>
+          </div>
+
+          <!-- Vertical Caliper Guide -->
+          <div id="rack-caliper-v" class="caliper-v" style="left: 50%;" title="Drag horizontally to check 19-inch EIA-310 rail width">
+            <div class="caliper-v-line"></div>
+            <span id="rack-caliper-v-label" class="absolute top-1 left-2 px-1.5 py-0.5 rounded bg-amber-500 text-slate-950 font-bold text-[10px] whitespace-nowrap shadow">
+              19.0" EIA-310 CENTER
+            </span>
+          </div>
+
+          <!-- Point-to-Point Tape SVG Overlay for Rack -->
+          <svg id="rack-tape-svg" class="absolute inset-0 w-full h-full pointer-events-none z-20 hidden">
+            <line id="rtape-line" x1="0" y1="0" x2="0" y2="0" stroke="#fbbf24" stroke-width="2" stroke-dasharray="5 3"/>
+            <circle id="rtape-p1" cx="0" cy="0" r="4.5" fill="#fbbf24"/>
+            <circle id="rtape-p2" cx="0" cy="0" r="4.5" fill="#fbbf24"/>
+            <rect id="rtape-bg" x="0" y="0" width="94" height="18" rx="3" fill="#fbbf24"/>
+            <text id="rtape-txt" x="0" y="0" fill="#071021" font-size="10" font-weight="bold" text-anchor="middle">0.0"</text>
+          </svg>
+
+          <!-- OUTER FULL CAGE ENCLOSURE HEADER -->
+          <div class="border-2 border-sky-400/80 rounded bg-[#060f1e]/95 shadow-inner relative">
+            <!-- Top Roof Fan / Cable Entry Cap -->
+            <div class="bg-sky-950/80 border-b border-sky-400/50 px-2.5 py-1.5 flex items-center justify-between text-[10px] text-sky-300">
+              <span id="rack-top-brand-stamp" class="font-bold tracking-wider">APC AR3100 // 40U</span>
+              <span>19" EIA-310-D // LOCKING CAGE</span>
+            </div>
+
+            <!-- Rack Interior & Side Cable Management Channels -->
+            <div class="relative flex">
+              <!-- Left Vertical Cable Channel + U-Numbers -->
+              <div class="w-8 sm:w-9 bg-[#08152b] border-r border-sky-500/40 flex flex-col justify-between py-0.5 text-[9px] text-sky-400/90 font-bold select-none" id="rack-left-rail-labels">
+                <!-- Populated by JS -->
+              </div>
+
+              <!-- Center 19" Equipment Mounting Bay -->
+              <div id="rack-slots-container" class="flex-1 divide-y divide-sky-500/15 relative bg-[#071122]">
+                <!-- Populated by JS (U40 down to U01) -->
+              </div>
+
+              <!-- Right Vertical Cable Channel + U-Numbers -->
+              <div class="w-8 sm:w-9 bg-[#08152b] border-l border-sky-500/40 flex flex-col justify-between py-0.5 text-[9px] text-sky-400/90 font-bold select-none" id="rack-right-rail-labels">
+                <!-- Populated by JS -->
+              </div>
+
+              <!-- Optional Closed Perforated Mesh Cage Door Overlay -->
+              <div id="rack-closed-door-overlay" class="hidden absolute inset-0 rack-cage-mesh bg-sky-950/45 border-2 border-sky-300/70 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center pointer-events-none">
+                <div class="px-3 py-1.5 rounded bg-[#071021]/95 border border-sky-400 text-sky-200 text-xs font-bold tracking-wider shadow-lg">
+                  🔒 PERFORATED MESH CAGE DOOR CLOSED
+                </div>
+                <div class="text-[10px] text-sky-300 mt-1 bg-[#071021]/90 px-2 py-0.5 rounded">
+                  Click "CAGE DOORS: CLOSED" above to open X-Ray view
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Heavy-Duty Casters & Leveling Feet Base -->
+            <div class="bg-sky-950/80 border-t border-sky-400/50 px-3 py-1.5 flex items-center justify-between text-[10px] text-sky-300">
+              <span>⏚ CHASSIS GROUND BONDED</span>
+              <span id="rack-bottom-dim-stamp">EXT: 23.6" W × 42.1" D</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUMN 3: MOUNTED UNIT INSPECTOR, POWER & ENCLOSURE DETAILS (3 COLS) -->
+      <aside class="xl:col-span-3 cad-box rounded p-3.5 space-y-3.5">
+        <div class="border-b border-sky-500/30 pb-2.5">
+          <div class="text-[11px] font-bold text-emerald-400 tracking-wider">MOUNTED HARDWARE INSPECTOR</div>
+          <h2 id="rack-insp-name" class="text-sm sm:text-base font-bold text-white mt-0.5">Select a Mounted Unit or Catalog Item</h2>
+        </div>
+
+        <div id="rack-insp-empty" class="text-xs text-sky-200/75 bg-[#071122] border border-sky-500/25 rounded p-3 leading-relaxed">
+          Click any mounted chassis inside the rack elevation on the left to inspect port density, wattage draw, depth clearance, pure sine wave / surge specs, or shift its U-position up/down.
+        </div>
+
+        <div id="rack-insp-details" class="hidden space-y-3 text-xs">
+          <div class="flex flex-wrap items-center justify-between gap-1.5">
+            <span id="rack-insp-slot-badge" class="px-2 py-0.5 rounded bg-sky-500/20 border border-sky-400 text-sky-200 font-bold text-[11px]">
+              MOUNTED: U38–U39 (2U)
+            </span>
+            <span id="rack-insp-cat-badge" class="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-400/50 text-amber-200 text-[10px] font-bold">
+              PURE SINE UPS
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <div class="rounded border border-sky-500/25 bg-[#071122] p-2">
+              <div class="text-sky-400/80 text-[10px]">POWER / RATING</div>
+              <div id="rack-insp-power" class="font-bold text-amber-300">1500VA / 1500W</div>
+            </div>
+            <div class="rounded border border-sky-500/25 bg-[#071122] p-2">
+              <div class="text-sky-400/80 text-[10px]">WEIGHT / DEPTH</div>
+              <div id="rack-insp-phys" class="font-bold text-white">55 lbs // 17.0" D</div>
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <div class="text-[10px] font-bold text-sky-400 uppercase">TECHNICAL SPECIFICATIONS</div>
+            <p id="rack-insp-desc" class="text-xs text-sky-100/85 bg-[#071122] border border-sky-500/20 rounded p-2.5 leading-relaxed"></p>
+          </div>
+
+          <div class="space-y-1">
+            <div class="text-[10px] font-bold text-emerald-300 uppercase">PORT / OUTPUT &amp; POWER INTERFACE</div>
+            <p id="rack-insp-ports" class="text-[11px] text-emerald-200/90 bg-[#071122] border border-emerald-500/25 rounded p-2 font-mono"></p>
+          </div>
+
+          <!-- Position Adjustment & Removal Controls -->
+          <div id="rack-insp-actions" class="pt-2 border-t border-sky-500/30 space-y-2">
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="nudgeSelectedRackItem(1)" class="px-2.5 py-1.5 rounded bg-sky-950 border border-sky-400/60 hover:bg-sky-900 text-sky-200 font-bold text-xs">
+                ▲ MOVE UP 1U
+              </button>
+              <button onclick="nudgeSelectedRackItem(-1)" class="px-2.5 py-1.5 rounded bg-sky-950 border border-sky-400/60 hover:bg-sky-900 text-sky-200 font-bold text-xs">
+                ▼ MOVE DOWN 1U
+              </button>
+            </div>
+            <button onclick="removeSelectedRackItem()" class="w-full px-3 py-1.5 rounded bg-rose-500/20 border border-rose-400 hover:bg-rose-500/30 text-rose-200 font-bold text-xs">
+              ✕ UNMOUNT FROM RACK
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Cage Enclosure Engineering Card -->
+        <div class="pt-2 border-t border-sky-500/30 space-y-1.5">
+          <div class="text-[11px] font-bold text-sky-300 uppercase">ACTIVE CAGE ENCLOSURE SPECS</div>
+          <div id="enclosure-detail-box" class="rounded border border-sky-500/25 bg-[#071122] p-2.5 text-[11px] space-y-1 text-sky-100/85">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: RACK BILL OF MATERIALS (BOM) & JSON SPEC EXPORT                -->
+  <!-- ===================================================================== -->
+  <div id="rack-bom-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+    <div class="cad-box rounded max-w-3xl w-full max-h-[90vh] overflow-y-auto p-4 sm:p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-sky-500/30 pb-3">
+        <div>
+          <span class="text-[11px] text-emerald-400 font-bold">DEXTERSLABS.NET // SHEET-02 SCHEDULE</span>
+          <h3 class="text-base sm:text-lg font-bold text-white">RACK ELEVATION BILL OF MATERIALS (BOM) &amp; POWER SCHEDULE</h3>
+        </div>
+        <button onclick="closeRackBomModal()" class="px-2.5 py-1 rounded border border-sky-500/40 text-sky-300 hover:text-white text-xs font-bold">✕ CLOSE</button>
+      </div>
+
+      <div id="bom-summary-strip" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs"></div>
+
+      <div class="overflow-x-auto border border-sky-500/30 rounded">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-sky-950/80 text-sky-300 border-b border-sky-500/30 text-[11px]">
+            <tr>
+              <th class="px-3 py-2">U-POS</th>
+              <th class="px-3 py-2">SIZE</th>
+              <th class="px-3 py-2">EQUIPMENT / MODEL</th>
+              <th class="px-3 py-2">CATEGORY</th>
+              <th class="px-3 py-2">LOAD</th>
+              <th class="px-3 py-2">WEIGHT</th>
+            </tr>
+          </thead>
+          <tbody id="bom-table-body" class="divide-y divide-sky-500/20 bg-[#071021]">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-amber-300">EXPORTABLE JSON CONFIGURATION:</span>
+          <button onclick="copyRackBomJson()" class="px-3 py-1 rounded bg-emerald-500/20 border border-emerald-400 text-emerald-200 hover:bg-emerald-500/30 text-xs font-bold">
+            COPY RACK CONFIG JSON
+          </button>
+        </div>
+        <pre id="rack-bom-json" class="rounded bg-[#050c1a] border border-sky-500/30 p-3 text-[11px] text-sky-200 max-h-48 overflow-auto"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. STRUCTURAL ZONE DATA & CHECKLIST STATE (2004 SPORTSTER TOY HAULER)
+    // =========================================================================
+    const ZONES_DATA = {
+      'front-bed': {
+        code: 'ZONE 01 // FRONT CAB & MASTER BED',
+        title: 'Front Wood Bed Frame & Bulkhead Strip',
+        badge: 'DEMO PHASE',
+        badgeClass: 'bg-rose-500/20 border-rose-400/50 text-rose-200',
+        footprint: "6'-0\" L × 8'-0\" W",
+        target: 'Clean Bulkhead + New Frame',
+        demoScope: 'Dismantle factory wood bed platform, under-bed storage dividers, and overhead upper cabinets down to the front aluminum/wood bulkhead framing.',
+        prepScope: 'Inspect front nose cap seams and lower corner framing for historical water staining; replace any soft 2×2 spruce framing members and re-insulate cavity.',
+        materials: [
+          'Kiln-dried 2×3 & 2×2 structural framing lumber',
+          '#10 × 3" structural coated wood-to-frame screws',
+          '1.5" R-7.5 rigid polyiso foam board insulation',
+          'Closed-cell acoustic/thermal vapor barrier tape'
+        ],
+        tasks: [
+          { id: 'fb-1', text: 'Remove factory mattress, plywood deck & bed frame', done: true },
+          { id: 'fb-2', text: 'Strip overhead cabinetry & front corner trim', done: false },
+          { id: 'fb-3', text: 'Inspect front nose cap framing for moisture rot', done: false }
+        ]
+      },
+      'mid-demo': {
+        code: 'ZONE 02 // MID-GALLEY & LIVING',
+        title: 'Couch & Dinette Complete Removal',
+        badge: 'DEMO PHASE',
+        badgeClass: 'bg-rose-500/20 border-rose-400/50 text-rose-200',
+        footprint: "9'-6\" L × 8'-0\" W",
+        target: '58"×24" Desk + PSU + NAS',
+        demoScope: 'Unbolt and extract OEM jackknife couch, factory dinette booths, center pedestal table, and water-swollen particleboard galley base down to bare wall studs and subfloor deck.',
+        prepScope: 'Inspect lower curbside/roadside wall plates for moisture wicking; sister compromised 2×2 studs and verify 9" wheel well housing structural integrity before setting new subfloor.',
+        materials: [
+          '58" × 24" solid pine workstation top (Phase 2)',
+          '36" structural under-desk spacer & steel L-brackets',
+          '1/2" birch plywood wheel well isolation box',
+          'Mean Well 5V/12V PSU + 6-gang fused rocker board'
+        ],
+        tasks: [
+          { id: 'md-1', text: 'Unbolt & remove OEM jackknife couch (curbside)', done: true },
+          { id: 'md-2', text: 'Demolish factory dinette booths & pedestal mount', done: true },
+          { id: 'md-3', text: 'Strip old galley cabinet & cap legacy water/LP lines', done: false }
+        ]
+      },
+      'subfloor': {
+        code: 'ZONE 03 // CHASSIS DECKING',
+        title: '3/4" Subfloor Flood Damage Replacement',
+        badge: 'CRITICAL STRUCTURAL',
+        badgeClass: 'bg-amber-500/20 border-amber-400/50 text-amber-200',
+        footprint: "18'-6\" L × 8'-0\" W",
+        target: '3/4" Marine/Exterior T&G',
+        demoScope: 'Cut and pry up delaminated, flood-damaged 3/4" factory subflooring across the rear toy hauler bay and curbside entry threshold down to bare steel outriggers.',
+        prepScope: 'Wire-wheel surface rust on steel chassis crossmembers, apply rust-inhibiting chassis enamel, and lay closed-cell sill foam before fastening new 3/4" tongue-and-groove sheets.',
+        materials: [
+          '3/4" Marine-grade / BCX exterior tongue-and-groove plywood',
+          '#12 × 2-1/4" self-drilling reamer wing Tek screws (to steel)',
+          'Polyurethane construction adhesive (subfloor-to-joist)',
+          '2-part penetrating epoxy edge sealer for cut perimeters'
+        ],
+        tasks: [
+          { id: 'sf-1', text: 'Score & extract rotted 3/4" subfloor in toy hauler bay', done: true },
+          { id: 'sf-2', text: 'Treat steel chassis outriggers & crossmembers', done: false },
+          { id: 'sf-3', text: 'Glue & screw new 3/4" T&G plywood sheets', done: false }
+        ]
+      },
+      'rear-ramp': {
+        code: 'ZONE 04 // REAR TOY HAULER BAY',
+        title: 'Rear Ramp Door Seal & Leak Mitigation',
+        badge: 'WATERPROOFING',
+        badgeClass: 'bg-rose-500/20 border-rose-400/50 text-rose-200',
+        footprint: "10'-6\" L × 8'-6\" W",
+        target: 'Zero-Intrusion Ramp Sill',
+        demoScope: 'Strip swollen rear threshold trim, corroded ramp hinge flashing, and perished rubber perimeter wiper seals responsible for water intrusion into the garage subfloor.',
+        prepScope: 'Square and reinforce rear ramp door jamb framing, install angled aluminum drip flashing above header, and bed new sill pan in continuous butyl/polyurethane sealant.',
+        materials: [
+          'Heavy-duty EPDM dual-bulb ramp perimeter compression seal',
+          '1/8" extruded aluminum rear threshold drip-edge sill',
+          'Sikaflex-221 / structural polyurethane marine sealant',
+          'Stainless steel #10 pan-head fasteners + backing plates'
+        ],
+        tasks: [
+          { id: 'rr-1', text: 'Remove perished ramp wiper gaskets & swollen threshold', done: true },
+          { id: 'rr-2', text: 'Fabricate & bed aluminum rear sill pan in Sikaflex', done: false },
+          { id: 'rr-3', text: 'Install new EPDM perimeter seal & pressure-test', done: false }
+        ]
+      },
+      'roof-envelope': {
+        code: 'ZONE 05 // EXTERIOR ROOF ENVELOPE',
+        title: 'Roof Membrane, AC Gasket & Seam Reseal',
+        badge: 'ENVELOPE SEAL',
+        badgeClass: 'bg-sky-500/20 border-sky-400/50 text-sky-200',
+        footprint: "26'-0\" L × 8'-6\" W",
+        target: '100% Watertight Shell',
+        demoScope: 'Scrape cracked, chalked lap sealant off front/rear termination bars, curbside/roadside roof-to-wall rails, roof AC shroud base, and plumbing/attic vents.',
+        prepScope: 'Clean EPDM/TPO roof membrane with dedicated cleaner, tighten all perimeter insert rail screws, replace compressed roof AC foam gasket, and apply fresh self-leveling sealant.',
+        materials: [
+          'Dicor / self-leveling RV lap sealant (horizontal seams)',
+          'Non-sag polyurethane sealant (vertical termination rails)',
+          '14" × 14" closed-cell replacement roof AC foam gasket',
+          '1/8" × 1" gray butyl tape under all vent flanges'
+        ],
+        tasks: [
+          { id: 're-1', text: 'Scrape failed lap sealant from all roof rails & vents', done: false },
+          { id: 're-2', text: 'Replace roof AC compression gasket & re-torque bolts', done: false },
+          { id: 're-3', text: 'Apply self-leveling sealant & vinyl rail insert', done: false }
+        ]
+      }
+    };
+
+    let currentZoneId = 'mid-demo';
+    let currentLayer = 'demo';
+    let calipersEnabled = true;
+    let snapEnabled = true;
+    let tapeMode = false;
+    let tapePoints = [];
+
+    // =========================================================================
+    // 2. NAVIGATION & VIEW SWITCHING
+    // =========================================================================
+    function switchTopTab(tab) {
+      const views = ['overview', 'sheet01', 'sheet02'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        const btn = document.getElementById(`nav-${v}`);
+        if (!el || !btn) return;
+        if (v === tab) {
+          el.classList.remove('hidden');
+          btn.classList.add('border-sky-400', 'bg-sky-500/20', 'text-white', 'font-semibold');
+          btn.classList.remove('border-sky-500/30', 'bg-sky-950/30', 'text-sky-200');
+        } else {
+          el.classList.add('hidden');
+          btn.classList.remove('border-sky-400', 'bg-sky-500/20', 'text-white', 'font-semibold');
+          btn.classList.add('border-sky-500/30', 'bg-sky-950/30', 'text-sky-200');
+        }
+      });
+    }
+
+    // =========================================================================
+    // 3. BLUEPRINT LAYER SWITCHING (DEMO / STRIPPED SHELL / PHASE 2)
+    // =========================================================================
+    function setBlueprintLayer(layer) {
+      currentLayer = layer;
+      const demoEls = document.querySelectorAll('.layer-demo-element');
+      const shellEls = document.querySelectorAll('.layer-shell-element');
+      const phase2El = document.getElementById('layer-phase2-overlay');
+      const subfloorDmg = document.getElementById('subfloor-damage-rect');
+      const statusDesc = document.getElementById('layer-status-desc');
+
+      // Reset button styles
+      ['demo', 'shell', 'phase2'].forEach(key => {
+        const b = document.getElementById(`btn-layer-${key}`);
+        b.className = 'px-3 py-1.5 rounded text-xs font-semibold border border-sky-500/40 bg-sky-950/40 text-sky-200 hover:border-sky-300 transition flex items-center gap-1.5';
+      });
+
+      if (layer === 'demo') {
+        document.getElementById('btn-layer-demo').className = 'px-3 py-1.5 rounded text-xs font-semibold border border-rose-400 bg-rose-500/20 text-rose-200 transition flex items-center gap-1.5';
+        demoEls.forEach(el => el.classList.remove('hidden'));
+        shellEls.forEach(el => el.classList.add('hidden'));
+        phase2El.classList.add('hidden');
+        subfloorDmg.setAttribute('opacity', '1');
+        statusDesc.className = 'text-rose-300 font-medium';
+        statusDesc.textContent = 'SHOWING: OEM FIXTURES & WATER-DAMAGED SUBFLOOR SLATED FOR FULL REMOVAL';
+      } else if (layer === 'shell') {
+        document.getElementById('btn-layer-shell').className = 'px-3 py-1.5 rounded text-xs font-semibold border border-sky-300 bg-sky-500/25 text-white transition flex items-center gap-1.5';
+        demoEls.forEach(el => el.classList.add('hidden'));
+        shellEls.forEach(el => el.classList.remove('hidden'));
+        phase2El.classList.add('hidden');
+        subfloorDmg.setAttribute('opacity', '0.25');
+        statusDesc.className = 'text-sky-300 font-medium';
+        statusDesc.textContent = 'SHOWING: BARE WALL STUDS, WHEEL WELL HOUSINGS & NEW 3/4" SUBFLOOR BASE';
+      } else if (layer === 'phase2') {
+        document.getElementById('btn-layer-phase2').className = 'px-3 py-1.5 rounded text-xs font-semibold border border-emerald-400 bg-emerald-500/20 text-emerald-200 transition flex items-center gap-1.5';
+        demoEls.forEach(el => el.classList.add('hidden'));
+        shellEls.forEach(el => el.classList.add('hidden'));
+        phase2El.classList.remove('hidden');
+        subfloorDmg.setAttribute('opacity', '0.12');
+        statusDesc.className = 'text-emerald-300 font-medium';
+        statusDesc.textContent = 'SHOWING: PHASE 2 DROP-IN PREVIEW (58"×24" DESK, MEAN WELL PSU & NAS RACK)';
+      }
+    }
+
+    // =========================================================================
+    // 4. ZONE INSPECTOR & DEMOLITION CHECKLIST LOGIC
+    // =========================================================================
+    function selectZone(zoneId) {
+      currentZoneId = zoneId;
+      const data = ZONES_DATA[zoneId];
+      if (!data) return;
+
+      // Highlight selected SVG zone
+      document.querySelectorAll('.zone-group').forEach(g => g.classList.remove('zone-selected'));
+      const activeSvgZone = document.getElementById(`zone-${zoneId}`);
+      if (activeSvgZone) activeSvgZone.classList.add('zone-selected');
+
+      // Highlight bottom pill buttons
+      document.querySelectorAll('.zone-pill').forEach(p => {
+        p.className = 'zone-pill px-2.5 py-1 rounded text-[11px] border border-sky-500/40 bg-sky-950/40 text-sky-200 hover:border-sky-300 transition';
+      });
+      const activePill = document.getElementById(`pill-${zoneId}`);
+      if (activePill) {
+        activePill.className = 'zone-pill px-2.5 py-1 rounded text-[11px] border border-sky-400 bg-sky-500/25 text-white font-semibold transition';
+      }
+
+      // Populate Inspector Fields
+      document.getElementById('insp-zone-code').textContent = data.code;
+      document.getElementById('insp-zone-title').textContent = data.title;
+      const badgeEl = document.getElementById('insp-zone-badge');
+      badgeEl.textContent = data.badge;
+      badgeEl.className = `px-2 py-0.5 rounded text-[10px] font-bold border shrink-0 ${data.badgeClass}`;
+
+      document.getElementById('insp-footprint').textContent = data.footprint;
+      document.getElementById('insp-target').textContent = data.target;
+      document.getElementById('insp-demo-scope').textContent = data.demoScope;
+      document.getElementById('insp-prep-scope').textContent = data.prepScope;
+
+      // Render Materials List
+      const matList = document.getElementById('insp-materials');
+      matList.innerHTML = data.materials.map(m => `
+        <li class="flex items-start gap-2">
+          <span class="text-amber-400 font-bold">▪</span>
+          <span>${m}</span>
+        </li>
+      `).join('');
+
+      renderZoneChecklist();
+    }
+
+    function renderZoneChecklist() {
+      const data = ZONES_DATA[currentZoneId];
+      const container = document.getElementById('insp-checklist');
+      const doneCount = data.tasks.filter(t => t.done).length;
+      document.getElementById('zone-checklist-count').textContent = `${doneCount}/${data.tasks.length} COMPLETE`;
+
+      container.innerHTML = data.tasks.map((task, idx) => `
+        <label class="flex items-start gap-2.5 p-2 rounded border ${task.done ? 'border-emerald-500/40 bg-emerald-950/25 text-emerald-200' : 'border-sky-500/25 bg-[#071122] text-sky-100'} cursor-pointer hover:border-sky-400 transition">
+          <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask('${currentZoneId}', ${idx})" class="mt-0.5 accent-emerald-400 rounded cursor-pointer"/>
+          <span class="text-xs leading-snug ${task.done ? 'line-through opacity-80' : ''}">${task.text}</span>
+        </label>
+      `).join('');
+
+      updateOverallProgress();
+    }
+
+    function toggleTask(zoneId, idx) {
+      ZONES_DATA[zoneId].tasks[idx].done = !ZONES_DATA[zoneId].tasks[idx].done;
+      renderZoneChecklist();
+    }
+
+    function updateOverallProgress() {
+      let total = 0;
+      let completed = 0;
+      Object.values(ZONES_DATA).forEach(z => {
+        z.tasks.forEach(t => {
+          total++;
+          if (t.done) completed++;
+        });
+      });
+      const pct = Math.round((completed / total) * 100);
+      document.getElementById('title-progress-pct').textContent = `${pct}%`;
+      document.getElementById('title-progress-bar').style.width = `${pct}%`;
+    }
+
+    // =========================================================================
+    // 5. INTERACTIVE CALIPER GUIDES, CURSOR COORDS & POINT-TO-POINT TAPE TOOL
+    // =========================================================================
+    function formatFeetInches(feetFloat) {
+      const clamped = Math.max(0, feetFloat);
+      let wholeFeet = Math.floor(clamped);
+      let inches = Math.round((clamped - wholeFeet) * 12);
+      if (snapEnabled) {
+        inches = Math.round(inches / 6) * 6;
+      }
+      if (inches === 12) {
+        wholeFeet += 1;
+        inches = 0;
+      }
+      return `${wholeFeet}'-${inches}"`;
+    }
+
+    function toggleCalipers() {
+      calipersEnabled = !calipersEnabled;
+      const h = document.getElementById('caliper-h');
+      const v = document.getElementById('caliper-v');
+      const btn = document.getElementById('btn-toggle-calipers');
+      if (calipersEnabled) {
+        h.classList.remove('hidden');
+        v.classList.remove('hidden');
+        btn.className = 'px-2.5 py-1.5 rounded text-xs font-semibold border border-amber-400 bg-amber-500/20 text-amber-200 transition';
+        btn.textContent = '⌖ CALIPER GUIDES: ON';
+      } else {
+        h.classList.add('hidden');
+        v.classList.add('hidden');
+        btn.className = 'px-2.5 py-1.5 rounded text-xs font-semibold border border-sky-500/40 bg-sky-950/40 text-sky-200 transition';
+        btn.textContent = '⌖ CALIPER GUIDES: OFF';
+      }
+    }
+
+    function toggleSnapGrid() {
+      snapEnabled = !snapEnabled;
+      const btn = document.getElementById('btn-toggle-snap');
+      if (snapEnabled) {
+        btn.className = 'px-2.5 py-1.5 rounded text-xs font-semibold border border-sky-400/60 bg-sky-500/15 text-sky-200 transition';
+        btn.textContent = '⊞ SNAP (6"): ON';
+      } else {
+        btn.className = 'px-2.5 py-1.5 rounded text-xs font-semibold border border-sky-500/40 bg-sky-950/40 text-sky-300/70 transition';
+        btn.textContent = '⊞ SNAP (6"): OFF';
+      }
+    }
+
+    function toggleTapeTool() {
+      tapeMode = !tapeMode;
+      tapePoints = [];
+      const btn = document.getElementById('btn-toggle-tape');
+      const pill = document.getElementById('tape-readout-pill');
+      const svgGroup = document.getElementById('tape-svg-group');
+
+      if (tapeMode) {
+        btn.className = 'px-2.5 py-1.5 rounded text-xs font-semibold border border-amber-400 bg-amber-500/25 text-amber-200 transition';
+        btn.textContent = '📏 POINT-TO-POINT TAPE: ON';
+        pill.classList.remove('hidden');
+        pill.textContent = 'TAPE: CLICK START POINT ON SHELL';
+        showToast('Point-to-Point Tape active: Click two points on the camper blueprint to measure span.');
+      } else {
+        btn.className = 'px-2.5 py-1.5 rounded text-xs font-semibold border border-sky-500/40 bg-sky-950/40 text-sky-200 hover:border-sky-300 transition';
+        btn.textContent = '📏 POINT-TO-POINT TAPE: OFF';
+        pill.classList.add('hidden');
+        svgGroup.classList.add('hidden');
+      }
+    }
+
+    function setupBlueprintInteractions() {
+      const stage = document.getElementById('blueprint-container');
+      const svg = document.getElementById('camper-svg');
+      const calH = document.getElementById('caliper-h');
+      const calV = document.getElementById('caliper-v');
+      let dragging = null;
+
+      function getSvgCoords(clientX, clientY) {
+        const rect = svg.getBoundingClientRect();
+        const scaleX = 960 / rect.width;
+        const scaleY = 440 / rect.height;
+        return {
+          x: (clientX - rect.left) * scaleX,
+          y: (clientY - rect.top) * scaleY,
+          pctX: ((clientX - rect.left) / rect.width) * 100,
+          pctY: ((clientY - rect.top) / rect.height) * 100
+        };
+      }
+
+      // Live Cursor Coordinate Readout
+      stage.addEventListener('pointermove', (e) => {
+        const pt = getSvgCoords(e.clientX, e.clientY);
+        // Camper box: X=110..890 (26ft => 30px/ft), Y=85..340 (8.5ft => 30px/ft)
+        const feetX = (pt.x - 110) / 30;
+        const feetY = (340 - pt.y) / 30;
+        document.getElementById('cursor-coords').textContent =
+          `X: ${formatFeetInches(feetX)} Y: ${formatFeetInches(feetY)}`;
+
+        if (dragging === 'h') {
+          const clampedPct = Math.min(92, Math.max(8, pt.pctY));
+          calH.style.top = `${clampedPct}%`;
+          const curFeetY = (340 - (clampedPct / 100) * 440) / 30;
+          document.getElementById('caliper-h-label').textContent =
+            `Y-AXIS: ${formatFeetInches(curFeetY)} FROM CURBSIDE WALL`;
+        } else if (dragging === 'v') {
+          const clampedPct = Math.min(95, Math.max(6, pt.pctX));
+          calV.style.left = `${clampedPct}%`;
+          const curFeetX = (((clampedPct / 100) * 960) - 110) / 30;
+          document.getElementById('caliper-v-label').textContent =
+            `STA: ${formatFeetInches(curFeetX)} FROM FRONT WALL`;
+        }
+      });
+
+      calH.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        dragging = 'h';
+        calH.setPointerCapture(e.pointerId);
+      });
+
+      calV.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        dragging = 'v';
+        calV.setPointerCapture(e.pointerId);
+      });
+
+      window.addEventListener('pointerup', () => {
+        dragging = null;
+      });
+
+      // Point-to-Point Tape Measurement Click Handler
+      svg.addEventListener('click', (e) => {
+        if (!tapeMode) return;
+        const pt = getSvgCoords(e.clientX, e.clientY);
+        if (tapePoints.length >= 2) {
+          tapePoints = [];
+        }
+        tapePoints.push(pt);
+
+        const svgGroup = document.getElementById('tape-svg-group');
+        const p1El = document.getElementById('tape-p1');
+        const p2El = document.getElementById('tape-p2');
+        const lineEl = document.getElementById('tape-line');
+        const bgEl = document.getElementById('tape-label-bg');
+        const txtEl = document.getElementById('tape-label-text');
+        const pill = document.getElementById('tape-readout-pill');
+
+        svgGroup.classList.remove('hidden');
+
+        if (tapePoints.length === 1) {
+          p1El.setAttribute('cx', pt.x);
+          p1El.setAttribute('cy', pt.y);
+          p2El.setAttribute('cx', pt.x);
+          p2El.setAttribute('cy', pt.y);
+          lineEl.setAttribute('x1', pt.x);
+          lineEl.setAttribute('y1', pt.y);
+          lineEl.setAttribute('x2', pt.x);
+          lineEl.setAttribute('y2', pt.y);
+          bgEl.setAttribute('opacity', '0');
+          txtEl.setAttribute('opacity', '0');
+          pill.textContent = 'TAPE: CLICK END POINT ON SHELL';
+        } else if (tapePoints.length === 2) {
+          const [a, b] = tapePoints;
+          p2El.setAttribute('cx', b.x);
+          p2El.setAttribute('cy', b.y);
+          lineEl.setAttribute('x2', b.x);
+          lineEl.setAttribute('y2', b.y);
+
+          const distPx = Math.hypot(b.x - a.x, b.y - a.y);
+          const distFeet = distPx / 30;
+          const formatted = formatFeetInches(distFeet);
+
+          const midX = (a.x + b.x) / 2;
+          const midY = (a.y + b.y) / 2;
+          bgEl.setAttribute('x', midX - 48);
+          bgEl.setAttribute('y', midY - 24);
+          bgEl.setAttribute('opacity', '1');
+          txtEl.setAttribute('x', midX);
+          txtEl.setAttribute('y', midY - 10);
+          txtEl.setAttribute('opacity', '1');
+          txtEl.textContent = formatted;
+          pill.textContent = `MEASURED SPAN: ${formatted}`;
+        }
+      });
+    }
+
+    // =========================================================================
+    // 6. "+ LOG NEW BUILD SHEET" MODAL & EXPORTABLE SNIPPET GENERATOR
+    // =========================================================================
+    const SHEET_PRESETS = {
+      pd140: {
+        num: 'SHEET 03',
+        cat: '12V POWER & EMBEDDED',
+        title: '140W USB-C PD 3.1 Buck-Boost Power Stage',
+        desc: '28V/5A EPR PD 3.1 output stage fed from 12V LiFePO4 bus with inline blade fusing and aluminum heatsink mount.'
+      },
+      truenas: {
+        num: 'SHEET 04',
+        cat: 'MOBILE HOMELAB & UPS',
+        title: 'TrueNAS UGREEN DXP4800 Plus Workstation Rack',
+        desc: 'Shock-isolated under-desk rack mount housing DXP4800 Plus NAS and pure-sine UPS tied into the 58"×24" workstation bay.'
+      },
+      wled: {
+        num: 'SHEET 05',
+        cat: 'CAR AUDIO & WLED LIGHTING',
+        title: '12V Audio Amp Rack & Dual-Zone WLED Controller',
+        desc: 'ESP32 WLED digital LED channels with level-shifter and fused 12V distribution block for interior cove lighting.'
+      }
+    };
+
+    function openNewSheetModal() {
+      document.getElementById('new-sheet-modal').classList.remove('hidden');
+      updateManifestPreview();
+    }
+
+    function closeNewSheetModal() {
+      document.getElementById('new-sheet-modal').classList.add('hidden');
+    }
+
+    function applySheetPreset(key) {
+      const p = SHEET_PRESETS[key];
+      if (!p) return;
+      document.getElementById('inp-sheet-num').value = p.num;
+      document.getElementById('inp-sheet-cat').value = p.cat;
+      document.getElementById('inp-sheet-title').value = p.title;
+      document.getElementById('inp-sheet-desc').value = p.desc;
+      updateManifestPreview();
+    }
+
+    function updateManifestPreview() {
+      const num = document.getElementById('inp-sheet-num').value.trim() || 'SHEET 03';
+      const cat = document.getElementById('inp-sheet-cat').value.trim() || 'CUSTOM BUILD';
+      const title = document.getElementById('inp-sheet-title').value.trim() || 'Untitled Project';
+      const desc = document.getElementById('inp-sheet-desc').value.trim() || '';
+
+      const manifestObj = {
+        domain: 'dexterslabs.net',
+        sheetId: num.toLowerCase().replace(/\s+/g, '-'),
+        sheetNumber: num,
+        discipline: cat,
+        title: title,
+        description: desc,
+        parentShell: '2004-sportster-toy-hauler',
+        status: 'QUEUED_FOR_PHASE_2'
+      };
+
+      document.getElementById('manifest-preview').textContent = JSON.stringify(manifestObj, null, 2);
+    }
+
+    ['inp-sheet-num', 'inp-sheet-cat', 'inp-sheet-title', 'inp-sheet-desc'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', updateManifestPreview);
+    });
+
+    function copyManifestSnippet() {
+      const text = document.getElementById('manifest-preview').textContent;
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Blueprint manifest JSON copied to clipboard.');
+    }
+
+    function appendProjectToIndex() {
+      const num = document.getElementById('inp-sheet-num').value.trim() || 'SHEET 03';
+      const cat = document.getElementById('inp-sheet-cat').value.trim() || 'CUSTOM BUILD';
+      const title = document.getElementById('inp-sheet-title').value.trim() || 'Untitled Project';
+      const desc = document.getElementById('inp-sheet-desc').value.trim() || '';
+
+      const grid = document.getElementById('overview-sheets-grid');
+      const card = document.createElement('div');
+      card.className = 'rounded border border-amber-400/60 bg-[#09162b] p-4 transition';
+      card.innerHTML = `
+        <div class="flex items-center justify-between text-xs mb-2">
+          <span class="font-bold text-amber-400">${num} // QUEUED</span>
+          <span class="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-400/30 text-[11px] text-amber-200">${cat}</span>
+        </div>
+        <h3 class="font-bold text-white">${title}</h3>
+        <p class="text-xs text-sky-100/70 mt-1.5">${desc}</p>
+        <div class="mt-3 pt-2 border-t border-sky-500/20 flex justify-between text-[11px] text-amber-300">
+          <span>LINKED TO SHT-02 SHELL</span>
+          <span>LOGGED ✓</span>
+        </div>
+      `;
+      grid.appendChild(card);
+
+      closeNewSheetModal();
+      switchTopTab('overview');
+      showToast(`Added ${num}: "${title}" to the dexterslabs.net blueprint directory.`);
+    }
+
+    // =========================================================================
+    // 7. TOAST HELPER & INITIALIZATION
+    // =========================================================================
+    // 6. SHEET 02: 40U / 42U POWER & HOMELAB RACK CONFIGURATOR ENGINE
+    // =========================================================================
+    const RACK_ENCLOSURES = [
+      {
+        id: 'apc-ar3100-40u',
+        name: 'APC NetShelter SX 40U/42U Full Cage (AR3100)',
+        uHeight: 40,
+        maxWeightLbs: 3000,
+        extDims: '23.6" W × 42.1" D × 78.4" H',
+        usableDepth: '36.0" Max Rail Depth',
+        doors: 'Perforated Split Rear + Locking Mesh Front Door + Solid Side Panels',
+        notes: 'Industry-standard 19" EIA-310-D steel cage with integrated vertical PDU/cable channels and roof brush entry.'
+      },
+      {
+        id: 'tripplite-sr42ub',
+        name: 'Tripp Lite SmartRack 42U Full Enclosure (SR42UB)',
+        uHeight: 42,
+        maxWeightLbs: 3000,
+        extDims: '23.6" W × 43.0" D × 78.5" H',
+        usableDepth: '37.0" Max Rail Depth',
+        doors: 'Locking Reversible Front/Rear Perforated Doors + Removable Side Cages',
+        notes: 'Heavy-duty welded steel frame with toolless OU vertical PDU mounting buttons and pre-installed casters/levelers.'
+      },
+      {
+        id: 'startech-rk4236bkf',
+        name: 'StarTech 42U Heavy-Duty Enclosed Cabinet (RK4236BKF)',
+        uHeight: 42,
+        maxWeightLbs: 2200,
+        extDims: '23.6" W × 39.4" D × 79.3" H',
+        usableDepth: '35.4" Max Rail Depth',
+        doors: 'Full Mesh Front/Rear Locking Doors + Vented Top Fan Tray',
+        notes: 'Adjustable square-hole M6 cage-nut rails with built-in cable management hooks and grounding lugs.'
+      },
+      {
+        id: 'middle-atlantic-bgr',
+        name: 'Middle Atlantic BGR-4027 / 40U Welded AV & Server Cage',
+        uHeight: 40,
+        maxWeightLbs: 3000,
+        extDims: '23.0" W × 27.0" D × 74.6" H',
+        usableDepth: '24.5" Usable Depth',
+        doors: 'Seismic-Rated Welded Steel Cage + Lever-Lock Internal Channels',
+        notes: 'Ideal for shallow-depth switches, Furman conditioners, drawers, and custom DC distribution panels.'
+      },
+      {
+        id: 'sysracks-42u-lcd',
+        name: 'Sysracks 42U 1000mm Deep Full Cage w/ LCD Fan Panel',
+        uHeight: 42,
+        maxWeightLbs: 1800,
+        extDims: '23.6" W × 39.4" D × 81.0" H',
+        usableDepth: '34.5" Usable Depth',
+        doors: 'Perforated Mesh or Tempered Glass Front + Thermostatic 4-Fan Roof',
+        notes: 'Includes digital LCD thermal controller, heavy-duty shelf, and brush-type cable entry glands.'
+      },
+      {
+        id: 'navepoint-42u',
+        name: 'NavePoint 42U Full Enclosed Server Cabinet',
+        uHeight: 42,
+        maxWeightLbs: 1760,
+        extDims: '23.6" W × 39.4" D × 79.5" H',
+        usableDepth: '33.0" Usable Depth',
+        doors: 'Locking Perforated Mesh Front/Rear Doors + Locking Side Panels',
+        notes: 'Cold-rolled steel 19" enclosure with removable top/bottom cable knockouts and dual cooling fans.'
+      },
+      {
+        id: 'camper-24u-shock',
+        name: 'Dexter Custom 24U RV / Toy Hauler Shock-Isolated Half-Rack',
+        uHeight: 24,
+        maxWeightLbs: 950,
+        extDims: '21.5" W × 26.0" D × 46.5" H',
+        usableDepth: '23.5" Usable Depth',
+        doors: 'Aluminum Extrusion Cage + Elastomer Vibration Isolators + Latching Door',
+        notes: 'Engineered for the 2004 Sportster Toy Hauler garage/workstation bay; tied directly into steel chassis outriggers.'
+      }
+    ];
+
+    const HARDWARE_CATALOG = [
+      // --- UBIQUITI & ROUTERS / GATEWAYS ---
+      {
+        id: 'udm-pro-max',
+        name: 'Ubiquiti UniFi Dream Machine Pro Max (UDM-Pro-Max)',
+        category: 'Routers & Gateways',
+        uHeight: 1,
+        wattsCont: 45,
+        wattsPeak: 100,
+        weightLbs: 10.4,
+        depthIn: 11.2,
+        color: 'sky',
+        ports: '1x 10G SFP+ WAN, 1x 2.5GbE WAN, 8x GbE LAN, 1x 10G SFP+ LAN, Dual NVR Bays',
+        desc: '5 Gbps IPS/IDS routing gateway with dual NVR drive bays, high-availability shadow mode, and 1.3" LCM status screen.'
+      },
+      {
+        id: 'udm-se',
+        name: 'Ubiquiti UniFi Dream Machine Special Edition (UDM-SE)',
+        category: 'Routers & Gateways',
+        uHeight: 1,
+        wattsCont: 50,
+        wattsPeak: 180,
+        weightLbs: 10.9,
+        depthIn: 11.2,
+        color: 'sky',
+        ports: '1x 10G SFP+ WAN, 1x 2.5GbE WAN, 8x GbE PoE/PoE+ Ports (180W Budget), 1x 10G SFP+',
+        desc: 'All-in-one UniFi OS console with built-in 8-port PoE+ switch, 128GB integrated SSD, and 3.5" NVR HDD bay.'
+      },
+      {
+        id: 'udm-pro',
+        name: 'Ubiquiti UniFi Dream Machine Pro (UDM-Pro)',
+        category: 'Routers & Gateways',
+        uHeight: 1,
+        wattsCont: 33,
+        wattsPeak: 50,
+        weightLbs: 8.6,
+        depthIn: 11.2,
+        color: 'sky',
+        ports: '1x 10G SFP+ WAN, 1x GbE WAN, 8x GbE LAN, 1x 10G SFP+ LAN',
+        desc: '3.5 Gbps IPS routing security gateway and UniFi Network/Protect controller with 3.5" HDD bay.'
+      },
+      {
+        id: 'unifi-efg',
+        name: 'Ubiquiti UniFi Enterprise Fortress Gateway (EFG)',
+        category: 'Routers & Gateways',
+        uHeight: 1,
+        wattsCont: 75,
+        wattsPeak: 140,
+        weightLbs: 15.8,
+        depthIn: 15.7,
+        color: 'sky',
+        ports: '2x 25G SFP28, 2x 10G SFP+, 2x 2.5GbE RJ45, Hot-Swap Redundant PSUs',
+        desc: '25 Gbps enterprise security gateway with 12.5 Gbps IPS throughput and dual hot-swappable power supplies.'
+      },
+      {
+        id: 'mikrotik-ccr2004',
+        name: 'MikroTik CCR2004-1G-12S+2XS Cloud Core Router',
+        category: 'Routers & Gateways',
+        uHeight: 1,
+        wattsCont: 32,
+        wattsPeak: 49,
+        weightLbs: 6.2,
+        depthIn: 8.3,
+        color: 'sky',
+        ports: '12x 10G SFP+, 2x 25G SFP28, 1x GbE Mgmt, Dual Redundant AC PSUs',
+        desc: '4-core ARMv8 1.7GHz router with 25G SFP28 uplinks, RouterOS v7 BGP/WireGuard, and dual redundant PSUs.'
+      },
+      {
+        id: 'netgate-8200',
+        name: 'Netgate 8200 MAX pfSense+ Security Gateway',
+        category: 'Routers & Gateways',
+        uHeight: 1,
+        wattsCont: 38,
+        wattsPeak: 65,
+        weightLbs: 9.5,
+        depthIn: 11.5,
+        color: 'sky',
+        ports: '2x 10G SFP+, 2x 10G RJ45, 4x 2.5GbE Discrete Ports',
+        desc: '8-core Intel Atom C3758R hardware appliance running pfSense+ with 18.6 Gbps L3 forwarding.'
+      },
+
+      // --- UBIQUITI & MANAGED NETWORK SWITCHES ---
+      {
+        id: 'usw-pro-max-24-poe',
+        name: 'Ubiquiti USW-Pro-Max-24-PoE (Etherlighting 400W)',
+        category: 'Network Switches',
+        uHeight: 1,
+        wattsCont: 65,
+        wattsPeak: 450,
+        weightLbs: 11.2,
+        depthIn: 12.9,
+        color: 'cyan',
+        ports: '8x 2.5GbE PoE++, 16x GbE PoE+/PoE++, 2x 10G SFP+, Etherlighting Ports',
+        desc: 'Layer 3 Etherlighting switch with 400W total PoE++ budget, 2.5GbE high-speed ports, and 10G SFP+ uplinks.'
+      },
+      {
+        id: 'usw-pro-max-48-poe',
+        name: 'Ubiquiti USW-Pro-Max-48-PoE (Etherlighting 720W)',
+        category: 'Network Switches',
+        uHeight: 1,
+        wattsCont: 95,
+        wattsPeak: 820,
+        weightLbs: 13.7,
+        depthIn: 15.7,
+        color: 'cyan',
+        ports: '16x 2.5GbE PoE++/PoE+, 32x GbE PoE+, 4x 10G SFP+',
+        desc: 'High-density 48-port Layer 3 switch with 720W PoE budget, 4x 10G SFP+, and USP-RPS DC backup port.'
+      },
+      {
+        id: 'usw-pro-24-poe',
+        name: 'Ubiquiti USW-Pro-24-PoE (Gen2 Layer 3)',
+        category: 'Network Switches',
+        uHeight: 1,
+        wattsCont: 50,
+        wattsPeak: 450,
+        weightLbs: 9.5,
+        depthIn: 11.2,
+        color: 'cyan',
+        ports: '16x GbE PoE+, 8x GbE PoE++, 2x 10G SFP+',
+        desc: 'Near-silent cooling Layer 3 PoE++ switch with 400W PoE budget and 10G SFP+ fiber uplinks.'
+      },
+      {
+        id: 'usw-enterprise-24-poe',
+        name: 'Ubiquiti USW-Enterprise-24-PoE (24x 2.5GbE)',
+        category: 'Network Switches',
+        uHeight: 1,
+        wattsCont: 60,
+        wattsPeak: 450,
+        weightLbs: 9.7,
+        depthIn: 12.8,
+        color: 'cyan',
+        ports: '24x 2.5GbE PoE+, 2x 10G SFP+',
+        desc: 'Full 24-port 2.5GbE Layer 3 PoE+ switch engineered for WiFi 6E/7 APs and multi-gig workstations.'
+      },
+      {
+        id: 'usw-aggregation',
+        name: 'Ubiquiti USW-Aggregation (8-Port 10G SFP+)',
+        category: 'Network Switches',
+        uHeight: 1,
+        wattsCont: 22,
+        wattsPeak: 30,
+        weightLbs: 5.8,
+        depthIn: 4.7,
+        color: 'cyan',
+        ports: '8x 10G SFP+ Fiber/DAC Ports (160 Gbps Switching)',
+        desc: 'Fanless 1U 10G fiber/DAC core aggregation switch linking NAS nodes, UDM-Pro-Max, and access switches.'
+      },
+      {
+        id: 'usw-pro-aggregation',
+        name: 'Ubiquiti USW-Pro-Aggregation (28x 10G + 4x 25G)',
+        category: 'Network Switches',
+        uHeight: 1,
+        wattsCont: 68,
+        wattsPeak: 100,
+        weightLbs: 10.1,
+        depthIn: 12.8,
+        color: 'cyan',
+        ports: '28x 10G SFP+, 4x 25G SFP28 (760 Gbps Switching)',
+        desc: 'Layer 3 core distribution switch with 25G SFP28 uplinks for high-throughput TrueNAS ZFS storage pools.'
+      },
+      {
+        id: 'mikrotik-crs326',
+        name: 'MikroTik CRS326-24G-2S+RM Cloud Router Switch',
+        category: 'Network Switches',
+        uHeight: 1,
+        wattsCont: 18,
+        wattsPeak: 24,
+        weightLbs: 4.4,
+        depthIn: 5.7,
+        color: 'cyan',
+        ports: '24x Gigabit Ethernet, 2x 10G SFP+, Dual-Boot SwOS/RouterOS',
+        desc: 'Fanless silent 24-port GbE + dual 10G SFP+ switch with DC jack (10–30V) capable of direct 12V/24V RV power.'
+      },
+
+      // --- COMPUTE, NAS & HOMELAB NODES ---
+      {
+        id: 'ugreen-dxp4800-shelf',
+        name: 'UGREEN NASync DXP4800 Plus (TrueNAS SCALE) on 2U Vented Shelf',
+        category: 'Compute & NAS Nodes',
+        uHeight: 3,
+        wattsCont: 58,
+        wattsPeak: 95,
+        weightLbs: 18.5,
+        depthIn: 14.0,
+        color: 'emerald',
+        ports: '1x 10GbE RJ45, 1x 2.5GbE, 4x 3.5" ZFS Bays + Dual NVMe Cache, USB4',
+        desc: 'Intel Pentium Gold 8505 5-core NAS running TrueNAS SCALE, mounted on a 2U heavy-duty vented rack shelf.'
+      },
+      {
+        id: 'thinkcentre-m720q-cluster',
+        name: 'Lenovo ThinkCentre M720q Tiny 3-Node Proxmox Cluster (1U Bracket)',
+        category: 'Compute & NAS Nodes',
+        uHeight: 1,
+        wattsCont: 65,
+        wattsPeak: 135,
+        weightLbs: 11.8,
+        depthIn: 8.5,
+        color: 'emerald',
+        ports: '3x Nodes (Intel i5/i7, 64GB RAM each, PCIe x8 Intel X520 10G SFP+ NICs)',
+        desc: 'Custom 3D-printed/steel 1U triple-node mount housing three Lenovo M720q Tiny hosts with 10G SFP+ riser cards.'
+      },
+      {
+        id: 'truenas-4u-24bay',
+        name: '4U TrueNAS ZFS 24-Bay Hot-Swap Storage Chassis',
+        category: 'Compute & NAS Nodes',
+        uHeight: 4,
+        wattsCont: 165,
+        wattsPeak: 290,
+        weightLbs: 54.0,
+        depthIn: 25.5,
+        color: 'emerald',
+        ports: '24x 3.5" SAS3/SATA3 Hot-Swap Bays, Dual 10G/25G NICs, Redundant PSU',
+        desc: 'High-capacity ZFS RAIDZ2 bulk storage array with 120mm mid-wall PWM fan wall and sliding ball-bearing rails.'
+      },
+      {
+        id: 'rpi-esp32-wled-1u',
+        name: '1U Raspberry Pi 5 + ESP32 WLED & Pi-hole Control Blade',
+        category: 'Compute & NAS Nodes',
+        uHeight: 1,
+        wattsCont: 15,
+        wattsPeak: 28,
+        weightLbs: 3.4,
+        depthIn: 6.5,
+        color: 'emerald',
+        ports: '2x RPi5 PoE+ Hats, 2x ESP32-S3 WLED Controllers, Front OLED Status',
+        desc: 'Dedicated infrastructure bay hosting redundant Pi-hole DNS, Home Assistant, and addressable WLED rack lighting.'
+      },
+
+      // --- RACK PULL-OUT SHELVES & DRAWERS ---
+      {
+        id: 'shelf-pullout-1u-vented',
+        name: '1U Vented Ball-Bearing Pull-Out Sliding Shelf (18"–24" Travel)',
+        category: 'Pull-Out Shelves & Drawers',
+        uHeight: 1,
+        wattsCont: 0,
+        wattsPeak: 0,
+        weightLbs: 12.5,
+        depthIn: 22.0,
+        color: 'indigo',
+        ports: '110 lb Load Capacity // Cold-Rolled Perforated Steel // Locking Latch',
+        desc: 'Full-extension sliding equipment shelf allowing tool-free top access to non-rackmount mini PCs, modems, or test gear.'
+      },
+      {
+        id: 'shelf-pullout-2u-heavy',
+        name: '2U Heavy-Duty Perforated Pull-Out Equipment Shelf (150 lb)',
+        category: 'Pull-Out Shelves & Drawers',
+        uHeight: 2,
+        wattsCont: 0,
+        wattsPeak: 0,
+        weightLbs: 16.0,
+        depthIn: 24.0,
+        color: 'indigo',
+        ports: '150 lb Load Capacity // 4-Post Adjustable Mounting Rails // Rear Cable Bar',
+        desc: 'Reinforced 2U sliding platform with rear tie-down slots—ideal for servicing tower NAS units or heavy bench PSUs.'
+      },
+      {
+        id: 'drawer-2u-locking',
+        name: '2U Locking Steel Pull-Out Storage Drawer (Tools / Ferrules / Patch)',
+        category: 'Pull-Out Shelves & Drawers',
+        uHeight: 2,
+        wattsCont: 0,
+        wattsPeak: 0,
+        weightLbs: 17.8,
+        depthIn: 16.0,
+        color: 'indigo',
+        ports: 'Keyed Cylinder Lock // Anti-Slip Rubber Liner // Rear Cable Knockouts',
+        desc: 'Deep pull-out utility drawer for RJ45 pass-through crimpers, heat-shrink ferrules, spare SFP+ DACs, and NVMe drives.'
+      },
+      {
+        id: 'tray-1u-kvm-lcd',
+        name: '1U Sliding Rackmount KVM Console w/ 17.3" Flip-Up FHD LCD',
+        category: 'Pull-Out Shelves & Drawers',
+        uHeight: 1,
+        wattsCont: 18,
+        wattsPeak: 25,
+        weightLbs: 26.5,
+        depthIn: 23.5,
+        color: 'indigo',
+        ports: '8-Port HDMI/USB KVM Switch, Backlit Keyboard, Touchpad, 1080p LCD',
+        desc: 'Pull-out crash-cart console providing local BIOS/Proxmox/TrueNAS access directly inside the rack.'
+      },
+
+      // --- RACKMOUNT UPS (PURE SINE WAVE / DOUBLE-CONVERSION / LIFEPO4) ---
+      {
+        id: 'cyberpower-or1500lcdrt2u',
+        name: 'CyberPower OR1500LCDRT2U (2U 1500VA / 900W AVR UPS)',
+        category: 'Rackmount UPS Systems',
+        uHeight: 2,
+        wattsCont: 12,
+        wattsPeak: 25,
+        weightLbs: 41.2,
+        depthIn: 15.2,
+        isUps: true,
+        upsVa: 1500,
+        upsWatts: 900,
+        upsWh: 216,
+        color: 'amber',
+        ports: '8x NEMA 5-15R Battery/Surge Outlets, USB/Serial NUT Daemon, LCD',
+        desc: 'Line-interactive AVR rackmount UPS with USB HID telemetry compatible with TrueNAS SCALE & Proxmox NUT server.'
+      },
+      {
+        id: 'cyberpower-pr2200rt2u',
+        name: 'CyberPower PR2200RT2U Smart App Pure Sine Wave (2U 2200VA/2200W)',
+        category: 'Rackmount UPS Systems',
+        uHeight: 2,
+        wattsCont: 18,
+        wattsPeak: 35,
+        weightLbs: 63.5,
+        depthIn: 19.7,
+        isUps: true,
+        upsVa: 2200,
+        upsWatts: 2200,
+        upsWh: 432,
+        color: 'amber',
+        ports: '8x NEMA 5-20R Pure Sine Wave Outlets, Tilting Matrix LCD, SNMP Slot',
+        desc: 'True Pure Sine Wave (0% THD) 1.0 power-factor UPS designed for active-PFC server PSUs and sensitive electronics.'
+      },
+      {
+        id: 'apc-smt1500rm2uc',
+        name: 'APC Smart-UPS SMT1500RM2UC (2U 1500VA / 1000W Pure Sine Wave)',
+        category: 'Rackmount UPS Systems',
+        uHeight: 2,
+        wattsCont: 15,
+        wattsPeak: 30,
+        weightLbs: 55.3,
+        depthIn: 18.0,
+        isUps: true,
+        upsVa: 1500,
+        upsWatts: 1000,
+        upsWh: 288,
+        color: 'amber',
+        ports: '6x NEMA 5-15R Switched Outlet Group, SmartConnect Cloud + USB/Serial',
+        desc: 'Line-interactive Pure Sine Wave Smart-UPS with green-mode >97% efficiency and switched outlet bank control.'
+      },
+      {
+        id: 'apc-srt2200rmxla',
+        name: 'APC Smart-UPS On-Line SRT2200RMXLA (2U Double-Conversion Pure Sine)',
+        category: 'Rackmount UPS Systems',
+        uHeight: 2,
+        wattsCont: 28,
+        wattsPeak: 55,
+        weightLbs: 55.1,
+        depthIn: 23.0,
+        isUps: true,
+        upsVa: 2200,
+        upsWatts: 1980,
+        upsWh: 518,
+        color: 'amber',
+        ports: '6x NEMA 5-20R + 1x L5-20R, Zero-Transfer Double-Conversion, EBM Port',
+        desc: 'Zero-transfer-time online double-conversion Pure Sine Wave UPS—isolates rack from dirty generator or shore power.'
+      },
+      {
+        id: 'eaton-5px1500rtg2',
+        name: 'Eaton 5PX1500RTG2 Gen2 (2U 1440VA / 1440W Pure Sine Wave)',
+        category: 'Rackmount UPS Systems',
+        uHeight: 2,
+        wattsCont: 14,
+        wattsPeak: 28,
+        weightLbs: 49.4,
+        depthIn: 17.6,
+        isUps: true,
+        upsVa: 1440,
+        upsWatts: 1440,
+        upsWh: 324,
+        color: 'amber',
+        ports: '8x NEMA 5-15R (2x Load Segments), ABM 3-Stage Charging, Gigabit NMC',
+        desc: 'Unity power factor (1440VA = 1440W) Pure Sine Wave UPS with ABM battery life extension and individual outlet metering.'
+      },
+      {
+        id: 'lifepo4-2u-ups',
+        name: '2U 2000VA / 1600W LiFePO4 Lithium Pure Sine Wave Rack UPS',
+        category: 'Rackmount UPS Systems',
+        uHeight: 2,
+        wattsCont: 14,
+        wattsPeak: 26,
+        weightLbs: 34.0,
+        depthIn: 17.5,
+        isUps: true,
+        upsVa: 2000,
+        upsWatts: 1600,
+        upsWh: 1024,
+        color: 'amber',
+        ports: '8x NEMA 5-15R Pure Sine Wave, 1024Wh Internal LiFePO4 (3500+ Cycles)',
+        desc: 'Lightweight lithium iron phosphate 2U rack UPS offering 3× the runtime of lead-acid and 10-year service life.'
+      },
+
+      // --- SURGE PROTECTION, PDUS & PURE SINE / DC POWER ADAPTERS ---
+      {
+        id: 'furman-pl8c',
+        name: 'Furman PL-8C 1U Power Conditioner & SMP Surge Suppressor',
+        category: 'Surge, PDUs & DC Power',
+        uHeight: 1,
+        wattsCont: 4,
+        wattsPeak: 8,
+        weightLbs: 11.0,
+        depthIn: 10.5,
+        color: 'rose',
+        ports: '9x Isolated NEMA 5-15R Outlets, Dual Pull-Out LED Rack Lights, 15A Breaker',
+        desc: 'Series Multi-Stage Protection (SMP), LiFT linear AC noise filtering, Extreme Voltage Shutdown, and retractable rack lamps.'
+      },
+      {
+        id: 'tripp-isobar12ultra',
+        name: 'Tripp Lite ISOBAR12ULTRA 1U 12-Outlet Isobar Metal Surge Protector',
+        category: 'Surge, PDUs & DC Power',
+        uHeight: 1,
+        wattsCont: 2,
+        wattsPeak: 4,
+        weightLbs: 4.8,
+        depthIn: 3.5,
+        color: 'rose',
+        ports: '12x NEMA 5-15R (2 Front, 10 Rear), 3840 Joules, Isolated Filter Banks',
+        desc: 'All-metal 1U surge suppressor with isolated noise filter banks preventing digital/switching PSU crosstalk.'
+      },
+      {
+        id: 'cyberpower-cps1220rms',
+        name: 'CyberPower CPS1220RMS 1U 20A 12-Outlet Rackmount Surge PDU',
+        category: 'Surge, PDUs & DC Power',
+        uHeight: 1,
+        wattsCont: 2,
+        wattsPeak: 4,
+        weightLbs: 5.2,
+        depthIn: 3.8,
+        color: 'rose',
+        ports: '12x NEMA 5-20R (6 Front, 6 Rear), 3600 Joules, 20A Circuit Breaker',
+        desc: 'Industrial 20-amp rackmount surge distribution unit with EMI/RFI noise filtering and 15ft heavy-duty cord.'
+      },
+      {
+        id: 'dexter-meanwell-dc-2u',
+        name: 'Dexter Custom 2U Mean Well 12V/5V DC + 140W USB-C PD 3.1 Panel',
+        category: 'Surge, PDUs & DC Power',
+        uHeight: 2,
+        wattsCont: 35,
+        wattsPeak: 350,
+        weightLbs: 9.4,
+        depthIn: 9.5,
+        color: 'rose',
+        ports: 'Mean Well LRS-350-12 + LRS-200-5, 6x Illuminated Rockers, 4x 140W PD 3.1, Anderson Powerpole',
+        desc: 'Custom anodized aluminum faceplate housing dual Mean Well PSUs, fused rocker switches, 140W USB-C PD 3.1 buck stages, and WLED DC bus.'
+      },
+      {
+        id: 'victron-pure-sine-2u',
+        name: '2U 2000W / 3000W Pure Sine Wave 12V/24V-to-120V Rack Inverter/Charger',
+        category: 'Surge, PDUs & DC Power',
+        uHeight: 2,
+        wattsCont: 22,
+        wattsPeak: 45,
+        weightLbs: 28.5,
+        depthIn: 16.5,
+        color: 'rose',
+        ports: '12V/24V DC Bus Lug Input, Pure Sine 120V AC Out, <10ms Auto-Transfer Switch',
+        desc: 'Rack-mounted pure sine wave inverter with built-in shore-power transfer switch and 80A LiFePO4 battery charger for RV/off-grid use.'
+      },
+      {
+        id: 'apc-ap9567-pdu',
+        name: 'APC AP9567 / Metered 1U 12-Outlet Rack PDU w/ Amp Display',
+        category: 'Surge, PDUs & DC Power',
+        uHeight: 1,
+        wattsCont: 3,
+        wattsPeak: 5,
+        weightLbs: 4.5,
+        depthIn: 3.5,
+        color: 'rose',
+        ports: '12x NEMA 5-15R Rear Outlets, Digital RMS Current Meter, Overload Alarm',
+        desc: 'Real-time local digital current meter PDU allowing instant verification of total rack amperage draw.'
+      },
+      {
+        id: 'patch-panel-24p',
+        name: '1U 24-Port Shielded Cat6A Keystone Patch Panel + Brush Manager',
+        category: 'Surge, PDUs & DC Power',
+        uHeight: 1,
+        wattsCont: 0,
+        wattsPeak: 0,
+        weightLbs: 2.8,
+        depthIn: 4.0,
+        color: 'sky',
+        ports: '24x Shielded RJ45 Keystones + Rear Cable Support Bar + Ground Wire',
+        desc: 'Structured 19" patch panel with rear strain-relief bar and chassis ground bond for clean front switch patching.'
+      }
+    ];
+
+    let activeEnclosureId = 'apc-ar3100-40u';
+    let activeCatalogCat = 'ALL';
+    let mountedRackItems = []; // { uid, hardwareId, startU }
+    let selectedMountedUid = null;
+    let rackViewFace = 'FRONT'; // 'FRONT' | 'REAR'
+    let rackDoorClosed = false;
+    let rackCalipersOn = true;
+    let rackTapeMode = false;
+    let rackTapePts = [];
+
+    function getActiveEnclosure() {
+      return RACK_ENCLOSURES.find(e => e.id === activeEnclosureId) || RACK_ENCLOSURES[0];
+    }
+
+    function getHardwareById(id) {
+      return HARDWARE_CATALOG.find(h => h.id === id);
+    }
+
+    function initRackConfigurator() {
+      // Populate Enclosure Select Dropdown
+      const encSelect = document.getElementById('enclosure-select');
+      encSelect.innerHTML = RACK_ENCLOSURES.map(enc =>
+        `<option value="${enc.id}">${enc.name} (${enc.uHeight}U)</option>`
+      ).join('');
+
+      // Populate Category Filter Tabs
+      const cats = ['ALL', ...new Set(HARDWARE_CATALOG.map(h => h.category))];
+      const catTabs = document.getElementById('catalog-cat-tabs');
+      catTabs.innerHTML = cats.map(c => `
+        <button onclick="setCatalogCategory('${c}')" data-cat="${c}" class="cat-tab-btn px-2 py-1 rounded text-[10.5px] border ${c === 'ALL' ? 'border-sky-400 bg-sky-500/20 text-white font-bold' : 'border-sky-500/30 bg-sky-950/40 text-sky-200 hover:border-sky-300'} transition">
+          ${c.toUpperCase()}
+        </button>
+      `).join('');
+
+      updateEnclosureUI();
+      applyRackPreset('dexter_hybrid', true);
+      setupRackStageInteractions();
+    }
+
+    function changeEnclosure(newId) {
+      activeEnclosureId = newId;
+      const enc = getActiveEnclosure();
+      // Filter out items that exceed new U height
+      mountedRackItems = mountedRackItems.filter(item => {
+        const hw = getHardwareById(item.hardwareId);
+        return hw && (item.startU + hw.uHeight - 1) <= enc.uHeight;
+      });
+      updateEnclosureUI();
+      renderRackElevation();
+      showToast(`Switched enclosure to ${enc.name} (${enc.uHeight}U).`);
+    }
+
+    function updateEnclosureUI() {
+      const enc = getActiveEnclosure();
+      document.getElementById('rack-title-enclosure-tag').textContent = enc.name.toUpperCase();
+      document.getElementById('rack-elevation-header').textContent = `${enc.uHeight}U FULL CAGE // ${rackViewFace} ELEVATION`;
+      document.getElementById('rack-top-brand-stamp').textContent = `${enc.name.split('(')[0].trim().toUpperCase()}`;
+      document.getElementById('rack-bottom-dim-stamp').textContent = `EXT: ${enc.extDims}`;
+      document.getElementById('rack-enclosure-specs-bar').textContent = `${enc.extDims} // MAX LOAD: ${enc.maxWeightLbs} LBS`;
+
+      document.getElementById('enclosure-detail-box').innerHTML = `
+        <div class="font-bold text-white">${enc.name}</div>
+        <div><span class="text-sky-400">Height / Load:</span> ${enc.uHeight}U // ${enc.maxWeightLbs} lbs static</div>
+        <div><span class="text-sky-400">Dimensions:</span> ${enc.extDims} (${enc.usableDepth})</div>
+        <div><span class="text-sky-400">Cage Doors:</span> ${enc.doors}</div>
+        <p class="text-sky-200/75 pt-1">${enc.notes}</p>
+      `;
+
+      // Update Target U dropdown
+      const uSel = document.getElementById('target-u-select');
+      const prevVal = parseInt(uSel.value, 10);
+      let opts = '';
+      for (let u = enc.uHeight; u >= 1; u--) {
+        opts += `<option value="${u}">U${String(u).padStart(2, '0')}</option>`;
+      }
+      uSel.innerHTML = opts;
+      if (prevVal && prevVal <= enc.uHeight) {
+        uSel.value = prevVal;
+      } else {
+        uSel.value = Math.min(enc.uHeight, 36);
+      }
+    }
+
+    function setCatalogCategory(cat) {
+      activeCatalogCat = cat;
+      document.querySelectorAll('.cat-tab-btn').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.className = 'cat-tab-btn px-2 py-1 rounded text-[10.5px] border border-sky-400 bg-sky-500/20 text-white font-bold transition';
+        } else {
+          btn.className = 'cat-tab-btn px-2 py-1 rounded text-[10.5px] border border-sky-500/30 bg-sky-950/40 text-sky-200 hover:border-sky-300 transition';
+        }
+      });
+      renderHardwareCatalog();
+    }
+
+    function renderHardwareCatalog() {
+      const query = (document.getElementById('catalog-search').value || '').toLowerCase().trim();
+      const list = document.getElementById('hardware-catalog-list');
+
+      const filtered = HARDWARE_CATALOG.filter(item => {
+        const matchesCat = activeCatalogCat === 'ALL' || item.category === activeCatalogCat;
+        const matchesQuery = !query ||
+          item.name.toLowerCase().includes(query) ||
+          item.category.toLowerCase().includes(query) ||
+          item.desc.toLowerCase().includes(query) ||
+          item.ports.toLowerCase().includes(query);
+        return matchesCat && matchesQuery;
+      });
+
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="p-4 text-center text-xs text-sky-300/70 border border-sky-500/25 rounded bg-[#071122]">No hardware matches "${query}".</div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(item => `
+        <div class="rounded border border-sky-500/30 hover:border-sky-400 bg-[#071122] p-2.5 transition space-y-1.5">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="px-1.5 py-0.5 rounded bg-sky-500/15 border border-sky-400/40 text-sky-300 font-bold text-[10px]">${item.uHeight}U</span>
+                <span class="text-[10px] text-amber-300 font-semibold uppercase">${item.category}</span>
+              </div>
+              <div class="font-bold text-white text-xs mt-1 leading-snug">${item.name}</div>
+            </div>
+            <button onclick="mountHardwareAtTarget('${item.id}')" class="shrink-0 px-2.5 py-1 rounded bg-emerald-500/20 border border-emerald-400 hover:bg-emerald-500/35 text-emerald-200 font-bold text-[11px] transition">
+              + MOUNT
+            </button>
+          </div>
+          <p class="text-[11px] text-sky-100/75 leading-relaxed">${item.desc}</p>
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-sky-500/15 text-[10px] text-sky-300/85">
+            <span>LOAD: ${item.wattsCont}W CONT / ${item.wattsPeak}W PK</span>
+            <span>WT: ${item.weightLbs} LBS // DEPTH: ${item.depthIn}"</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function isRangeFree(startU, uHeight, ignoreUid = null) {
+      const enc = getActiveEnclosure();
+      const endU = startU + uHeight - 1;
+      if (startU < 1 || endU > enc.uHeight) return false;
+
+      for (const m of mountedRackItems) {
+        if (ignoreUid && m.uid === ignoreUid) continue;
+        const mHw = getHardwareById(m.hardwareId);
+        if (!mHw) continue;
+        const mEnd = m.startU + mHw.uHeight - 1;
+        if (startU <= mEnd && endU >= m.startU) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function findNearestFreeU(preferredStartU, uHeight) {
+      const enc = getActiveEnclosure();
+      const maxStart = enc.uHeight - uHeight + 1;
+      const clampedPref = Math.min(maxStart, Math.max(1, preferredStartU));
+      if (isRangeFree(clampedPref, uHeight)) return clampedPref;
+
+      // Search downwards first, then upwards
+      for (let offset = 1; offset <= enc.uHeight; offset++) {
+        if (clampedPref - offset >= 1 && isRangeFree(clampedPref - offset, uHeight)) {
+          return clampedPref - offset;
+        }
+        if (clampedPref + offset <= maxStart && isRangeFree(clampedPref + offset, uHeight)) {
+          return clampedPref + offset;
+        }
+      }
+      return null;
+    }
+
+    function mountHardwareAtTarget(hardwareId, explicitStartU = null) {
+      const hw = getHardwareById(hardwareId);
+      if (!hw) return;
+
+      const targetSel = parseInt(document.getElementById('target-u-select').value, 10) || 20;
+      const desiredStart = explicitStartU !== null ? explicitStartU : (targetSel - hw.uHeight + 1);
+      const validStartU = findNearestFreeU(desiredStart, hw.uHeight);
+
+      if (validStartU === null) {
+        showToast(`Insufficient contiguous U-space (${hw.uHeight}U required) in current rack.`);
+        return;
+      }
+
+      const uid = 'mnt-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+      mountedRackItems.push({ uid, hardwareId: hw.id, startU: validStartU });
+      selectedMountedUid = uid;
+
+      // Advance target U down to next open slot below mounted item
+      const nextU = Math.max(1, validStartU - 1);
+      document.getElementById('target-u-select').value = nextU;
+
+      renderRackElevation();
+      inspectMountedItem(uid);
+      showToast(`Mounted ${hw.name} at U${String(validStartU).padStart(2, '0')}${hw.uHeight > 1 ? '–U' + String(validStartU + hw.uHeight - 1).padStart(2, '0') : ''}.`);
+    }
+
+    function renderRackElevation() {
+      const enc = getActiveEnclosure();
+      const slotsContainer = document.getElementById('rack-slots-container');
+      const leftRail = document.getElementById('rack-left-rail-labels');
+      const rightRail = document.getElementById('rack-right-rail-labels');
+
+      // Map U-slot -> mounted item
+      const uMap = {};
+      mountedRackItems.forEach(item => {
+        const hw = getHardwareById(item.hardwareId);
+        if (!hw) return;
+        for (let u = item.startU; u < item.startU + hw.uHeight; u++) {
+          uMap[u] = { item, hw, isTop: u === item.startU + hw.uHeight - 1 };
+        }
+      });
+
+      let leftHtml = '';
+      let rightHtml = '';
+      let centerHtml = '';
+
+      const rowHeightPx = enc.uHeight <= 24 ? 24 : 18;
+
+      for (let u = enc.uHeight; u >= 1; u--) {
+        const uStr = String(u).padStart(2, '0');
+        leftHtml += `<div style="height:${rowHeightPx}px" class="flex items-center justify-center border-b border-sky-500/15">${uStr}</div>`;
+        rightHtml += `<div style="height:${rowHeightPx}px" class="flex items-center justify-center border-b border-sky-500/15">${uStr}</div>`;
+
+        const entry = uMap[u];
+        if (entry) {
+          if (entry.isTop) {
+            const { item, hw } = entry;
+            const spanPx = hw.uHeight * rowHeightPx;
+            const isSel = item.uid === selectedMountedUid;
+            const topU = item.startU + hw.uHeight - 1;
+            const uLabel = hw.uHeight > 1 ? `U${String(topU).padStart(2, '0')}-U${String(item.startU).padStart(2, '0')}` : `U${uStr}`;
+
+            const colorStyles = {
+              sky: 'bg-sky-950/90 border-sky-400 text-sky-100',
+              cyan: 'bg-cyan-950/90 border-cyan-400 text-cyan-100',
+              emerald: 'bg-emerald-950/90 border-emerald-400 text-emerald-100',
+              indigo: 'bg-indigo-950/90 border-indigo-400 text-indigo-100',
+              amber: 'bg-amber-950/90 border-amber-400 text-amber-100',
+              rose: 'bg-rose-950/90 border-rose-400 text-rose-100'
+            };
+            const theme = colorStyles[hw.color] || colorStyles.sky;
+
+            centerHtml += `
+              <div onclick="inspectMountedItem('${item.uid}')" style="height:${spanPx}px"
+                   class="cursor-pointer px-2 flex items-center justify-between gap-1.5 border-y ${theme} ${isSel ? 'ring-2 ring-white z-10 shadow-[0_0_14px_rgba(56,189,248,0.65)]' : 'hover:brightness-125'} transition relative overflow-hidden">
+                <!-- Left Rack Ear & Screws -->
+                <div class="flex items-center gap-1.5 min-w-0">
+                  <span class="w-1.5 h-1.5 rounded-full bg-current opacity-80 shrink-0"></span>
+                  <span class="text-[10px] font-bold truncate">
+                    ${rackViewFace === 'FRONT' ? hw.name : '[REAR] ' + hw.ports}
+                  </span>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0 text-[9px] font-bold opacity-90">
+                  <span class="hidden sm:inline">${hw.wattsCont}W</span>
+                  <span class="px-1 rounded bg-black/40 border border-current/30">${uLabel}</span>
+                </div>
+              </div>
+            `;
+          }
+        } else {
+          // Empty 1U slot - clickable to set Target U
+          centerHtml += `
+            <div onclick="selectEmptyRackSlot(${u})" style="height:${rowHeightPx}px"
+                 class="rack-unit-row cursor-pointer px-2 flex items-center justify-between text-[9px] text-sky-500/40 hover:text-sky-300">
+              <span>· · · OPEN ${uStr}U · · ·</span>
+              <span class="opacity-0 hover:opacity-100">+ SET TARGET</span>
+            </div>
+          `;
+        }
+      }
+
+      leftRail.innerHTML = leftHtml;
+      rightRail.innerHTML = rightHtml;
+      slotsContainer.innerHTML = centerHtml;
+      updateRackTelemetry();
+    }
+
+    function selectEmptyRackSlot(u) {
+      document.getElementById('target-u-select').value = u;
+      document.getElementById('rack-cursor-readout').textContent = `TARGET U-SLOT: U${String(u).padStart(2, '0')}`;
+      showToast(`Target mount slot set to U${String(u).padStart(2, '0')}. Click "+ MOUNT" on any catalog item.`);
+    }
+
+    function inspectMountedItem(uid) {
+      selectedMountedUid = uid;
+      renderRackElevation();
+
+      const item = mountedRackItems.find(m => m.uid === uid);
+      if (!item) return;
+      const hw = getHardwareById(item.hardwareId);
+      if (!hw) return;
+
+      document.getElementById('rack-insp-empty').classList.add('hidden');
+      document.getElementById('rack-insp-details').classList.remove('hidden');
+
+      const topU = item.startU + hw.uHeight - 1;
+      const rangeStr = hw.uHeight > 1
+        ? `U${String(topU).padStart(2, '0')}–U${String(item.startU).padStart(2, '0')} (${hw.uHeight}U)`
+        : `U${String(item.startU).padStart(2, '0')} (1U)`;
+
+      document.getElementById('rack-insp-name').textContent = hw.name;
+      document.getElementById('rack-insp-slot-badge').textContent = `MOUNTED: ${rangeStr}`;
+      document.getElementById('rack-insp-cat-badge').textContent = hw.category.toUpperCase();
+      document.getElementById('rack-insp-power').textContent = hw.isUps
+        ? `${hw.upsVa}VA / ${hw.upsWatts}W (${hw.upsWh}Wh)`
+        : `${hw.wattsCont}W CONT / ${hw.wattsPeak}W PEAK`;
+      document.getElementById('rack-insp-phys').textContent = `${hw.weightLbs} lbs // ${hw.depthIn}" D`;
+      document.getElementById('rack-insp-desc').textContent = hw.desc;
+      document.getElementById('rack-insp-ports').textContent = hw.ports;
+    }
+
+    function nudgeSelectedRackItem(deltaU) {
+      if (!selectedMountedUid) return;
+      const item = mountedRackItems.find(m => m.uid === selectedMountedUid);
+      if (!item) return;
+      const hw = getHardwareById(item.hardwareId);
+      const nextStartU = item.startU + deltaU;
+
+      if (!isRangeFree(nextStartU, hw.uHeight, item.uid)) {
+        showToast(`Cannot move ${hw.name}: slot collision or enclosure boundary reached.`);
+        return;
+      }
+      item.startU = nextStartU;
+      inspectMountedItem(item.uid);
+    }
+
+    function removeSelectedRackItem() {
+      if (!selectedMountedUid) return;
+      mountedRackItems = mountedRackItems.filter(m => m.uid !== selectedMountedUid);
+      selectedMountedUid = null;
+      document.getElementById('rack-insp-details').classList.add('hidden');
+      document.getElementById('rack-insp-empty').classList.remove('hidden');
+      document.getElementById('rack-insp-name').textContent = 'Select a Mounted Unit or Catalog Item';
+      renderRackElevation();
+      showToast('Hardware unmounted from rack elevation.');
+    }
+
+    function updateRackTelemetry() {
+      const enc = getActiveEnclosure();
+      let usedU = 0;
+      let totalWeight = 0;
+      let totalContWatts = 0;
+      let totalPeakWatts = 0;
+      let totalUpsWh = 0;
+      let upsCount = 0;
+
+      mountedRackItems.forEach(m => {
+        const hw = getHardwareById(m.hardwareId);
+        if (!hw) return;
+        usedU += hw.uHeight;
+        totalWeight += hw.weightLbs;
+        totalContWatts += hw.wattsCont;
+        totalPeakWatts += hw.wattsPeak;
+        if (hw.isUps) {
+          upsCount++;
+          totalUpsWh += hw.upsWh;
+        }
+      });
+
+      const freeU = enc.uHeight - usedU;
+      document.getElementById('telem-ru').textContent = `${usedU}U / ${enc.uHeight}U (${freeU}U FREE)`;
+      document.getElementById('telem-weight').textContent = `${totalWeight.toFixed(1)} lbs / ${enc.maxWeightLbs} lb`;
+      document.getElementById('telem-watts').textContent = `${totalContWatts}W / ${totalPeakWatts}W`;
+
+      if (upsCount > 0 && totalContWatts > 0) {
+        // Inverter efficiency ~85%
+        const estMinutes = Math.round(((totalUpsWh * 0.85) / totalContWatts) * 60);
+        document.getElementById('telem-runtime').textContent = `~${estMinutes} MIN (${upsCount} UPS)`;
+      } else if (upsCount > 0) {
+        document.getElementById('telem-runtime').textContent = `STANDBY (${totalUpsWh}Wh)`;
+      } else {
+        document.getElementById('telem-runtime').textContent = `-- MIN (NO UPS)`;
+      }
+
+      // 15A (1800W max, 1440W continuous 80%) & 20A (2400W max, 1920W continuous 80%)
+      const pct15 = Math.round((totalContWatts / 1800) * 100);
+      const pct20 = Math.round((totalContWatts / 2400) * 100);
+      document.getElementById('telem-breaker').textContent = `${pct15}% (15A) / ${pct20}% (20A)`;
+    }
+
+    function applyRackPreset(presetKey, silent = false) {
+      mountedRackItems = [];
+      selectedMountedUid = null;
+
+      if (presetKey === 'clear') {
+        document.getElementById('rack-insp-details').classList.add('hidden');
+        document.getElementById('rack-insp-empty').classList.remove('hidden');
+        document.getElementById('rack-insp-name').textContent = 'Select a Mounted Unit or Catalog Item';
+        renderRackElevation();
+        if (!silent) showToast('Cleared all equipment from rack.');
+        return;
+      }
+
+      if (presetKey === 'dexter_hybrid') {
+        activeEnclosureId = 'apc-ar3100-40u';
+        document.getElementById('enclosure-select').value = activeEnclosureId;
+        updateEnclosureUI();
+
+        const plan = [
+          { id: 'furman-pl8c', startU: 40 },
+          { id: 'udm-pro-max', startU: 39 },
+          { id: 'patch-panel-24p', startU: 38 },
+          { id: 'usw-pro-max-24-poe', startU: 37 },
+          { id: 'usw-aggregation', startU: 36 },
+          { id: 'thinkcentre-m720q-cluster', startU: 34 },
+          { id: 'rpi-esp32-wled-1u', startU: 33 },
+          { id: 'ugreen-dxp4800-shelf', startU: 28 },
+          { id: 'tray-1u-kvm-lcd', startU: 25 },
+          { id: 'drawer-2u-locking', startU: 22 },
+          { id: 'dexter-meanwell-dc-2u', startU: 16 },
+          { id: 'tripp-isobar12ultra', startU: 14 },
+          { id: 'cyberpower-pr2200rt2u', startU: 4 },
+          { id: 'cyberpower-or1500lcdrt2u', startU: 1 }
+        ];
+        plan.forEach(p => {
+          mountedRackItems.push({
+            uid: 'preset-' + p.id + '-' + p.startU,
+            hardwareId: p.id,
+            startU: p.startU
+          });
+        });
+      } else if (presetKey === 'enterprise_10g') {
+        activeEnclosureId = 'tripplite-sr42ub';
+        document.getElementById('enclosure-select').value = activeEnclosureId;
+        updateEnclosureUI();
+
+        const plan = [
+          { id: 'apc-ap9567-pdu', startU: 42 },
+          { id: 'unifi-efg', startU: 41 },
+          { id: 'usw-pro-aggregation', startU: 40 },
+          { id: 'patch-panel-24p', startU: 39 },
+          { id: 'usw-pro-max-48-poe', startU: 38 },
+          { id: 'truenas-4u-24bay', startU: 30 },
+          { id: 'shelf-pullout-1u-vented', startU: 28 },
+          { id: 'tray-1u-kvm-lcd', startU: 26 },
+          { id: 'apc-srt2200rmxla', startU: 4 },
+          { id: 'eaton-5px1500rtg2', startU: 1 }
+        ];
+        plan.forEach(p => {
+          mountedRackItems.push({
+            uid: 'preset-' + p.id + '-' + p.startU,
+            hardwareId: p.id,
+            startU: p.startU
+          });
+        });
+      } else if (presetKey === 'camper_offgrid') {
+        activeEnclosureId = 'camper-24u-shock';
+        document.getElementById('enclosure-select').value = activeEnclosureId;
+        updateEnclosureUI();
+
+        const plan = [
+          { id: 'furman-pl8c', startU: 24 },
+          { id: 'udm-se', startU: 23 },
+          { id: 'mikrotik-crs326', startU: 22 },
+          { id: 'rpi-esp32-wled-1u', startU: 21 },
+          { id: 'ugreen-dxp4800-shelf', startU: 17 },
+          { id: 'drawer-2u-locking', startU: 14 },
+          { id: 'dexter-meanwell-dc-2u', startU: 10 },
+          { id: 'victron-pure-sine-2u', startU: 6 },
+          { id: 'lifepo4-2u-ups', startU: 2 }
+        ];
+        plan.forEach(p => {
+          mountedRackItems.push({
+            uid: 'preset-' + p.id + '-' + p.startU,
+            hardwareId: p.id,
+            startU: p.startU
+          });
+        });
+      }
+
+      renderRackElevation();
+      if (mountedRackItems.length > 0) {
+        inspectMountedItem(mountedRackItems[0].uid);
+      }
+      if (!silent) showToast(`Loaded rack preset configuration (${mountedRackItems.length} chassis mounted).`);
+    }
+
+    function toggleRackDepthView() {
+      rackViewFace = rackViewFace === 'FRONT' ? 'REAR' : 'FRONT';
+      const btn = document.getElementById('btn-rack-face');
+      btn.textContent = `VIEW: ${rackViewFace} ELEVATION`;
+      updateEnclosureUI();
+      renderRackElevation();
+    }
+
+    function toggleRackCageDoor() {
+      rackDoorClosed = !rackDoorClosed;
+      const overlay = document.getElementById('rack-closed-door-overlay');
+      const btn = document.getElementById('btn-rack-door');
+      if (rackDoorClosed) {
+        overlay.classList.remove('hidden');
+        btn.className = 'px-2.5 py-1.5 rounded text-xs font-semibold border border-amber-400 bg-amber-500/20 text-amber-200 transition';
+        btn.textContent = 'CAGE DOORS: CLOSED (MESH)';
+      } else {
+        overlay.classList.add('hidden');
+        btn.className = 'px-2.5 py-1.5 rounded text-xs font-semibold border border-sky-500/40 bg-sky-950/40 text-sky-200 hover:border-sky-300 transition';
+        btn.textContent = 'CAGE DOORS: OPEN (X-RAY)';
+      }
+    }
+
+    function toggleRackCalipers() {
+      rackCalipersOn = !rackCalipersOn;
+      const h = document.getElementById('rack-caliper-h');
+      const v = document.getElementById('rack-caliper-v');
+      const btn = document.getElementById('btn-rack-calipers');
+      if (rackCalipersOn) {
+        h.classList.remove('hidden');
+        v.classList.remove('hidden');
+        btn.className = 'px-2.5 py-1.5 rounded text-xs font-semibold border border-amber-400 bg-amber-500/20 text-amber-200 transition';
+        btn.textContent = '⌖ CALIPERS: ON';
+      } else {
+        h.classList.add('hidden');
+        v.classList.add('hidden');
+        btn.className = 'px-2.5 py-1.5 rounded text-xs font-semibold border border-sky-500/40 bg-sky-950/40 text-sky-200 transition';
+        btn.textContent = '⌖ CALIPERS: OFF';
+      }
+    }
+
+    function toggleRackTape() {
+      rackTapeMode = !rackTapeMode;
+      rackTapePts = [];
+      const btn = document.getElementById('btn-rack-tape');
+      const pill = document.getElementById('rack-tape-pill');
+      const svg = document.getElementById('rack-tape-svg');
+
+      if (rackTapeMode) {
+        btn.className = 'px-2.5 py-1.5 rounded text-xs font-semibold border border-amber-400 bg-amber-500/25 text-amber-200 transition';
+        btn.textContent = '📏 TAPE: ON';
+        pill.classList.remove('hidden');
+        pill.textContent = 'TAPE: CLICK START POINT ON RACK CHASSIS';
+      } else {
+        btn.className = 'px-2.5 py-1.5 rounded text-xs font-semibold border border-sky-500/40 bg-sky-950/40 text-sky-200 hover:border-sky-300 transition';
+        btn.textContent = '📏 TAPE: OFF';
+        pill.classList.add('hidden');
+        svg.classList.add('hidden');
+      }
+    }
+
+    function setupRackStageInteractions() {
+      const stage = document.getElementById('rack-blueprint-stage');
+      const calH = document.getElementById('rack-caliper-h');
+      const calV = document.getElementById('rack-caliper-v');
+      let dragging = null;
+
+      stage.addEventListener('pointermove', (e) => {
+        const rect = stage.getBoundingClientRect();
+        const pctX = ((e.clientX - rect.left) / rect.width) * 100;
+        const pctY = ((e.clientY - rect.top) / rect.height) * 100;
+        const enc = getActiveEnclosure();
+
+        if (dragging === 'h') {
+          const clampedY = Math.min(95, Math.max(5, pctY));
+          calH.style.top = `${clampedY}%`;
+          const uAtPos = Math.max(1, Math.min(enc.uHeight, Math.round(enc.uHeight * (1 - clampedY / 100)) + 1));
+          const inchesAff = (uAtPos * 1.75).toFixed(2);
+          document.getElementById('rack-caliper-h-label').textContent = `ELEV: U${String(uAtPos).padStart(2, '0')} (${inchesAff}" AFF)`;
+        } else if (dragging === 'v') {
+          const clampedX = Math.min(95, Math.max(5, pctX));
+          calV.style.left = `${clampedX}%`;
+          const widthIn = ((clampedX / 100) * 19.0).toFixed(2);
+          document.getElementById('rack-caliper-v-label').textContent = `X-RAIL: ${widthIn}" / 19.0" EIA`;
+        }
+      });
+
+      calH.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        dragging = 'h';
+        calH.setPointerCapture(e.pointerId);
+      });
+
+      calV.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        dragging = 'v';
+        calV.setPointerCapture(e.pointerId);
+      });
+
+      window.addEventListener('pointerup', () => {
+        dragging = null;
+      });
+
+      stage.addEventListener('click', (e) => {
+        if (!rackTapeMode) return;
+        const rect = stage.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        if (rackTapePts.length >= 2) rackTapePts = [];
+        rackTapePts.push({ x, y, w: rect.width, h: rect.height });
+
+        const svg = document.getElementById('rack-tape-svg');
+        const p1 = document.getElementById('rtape-p1');
+        const p2 = document.getElementById('rtape-p2');
+        const line = document.getElementById('rtape-line');
+        const bg = document.getElementById('rtape-bg');
+        const txt = document.getElementById('rtape-txt');
+        const pill = document.getElementById('rack-tape-pill');
+
+        svg.classList.remove('hidden');
+
+        if (rackTapePts.length === 1) {
+          p1.setAttribute('cx', x); p1.setAttribute('cy', y);
+          p2.setAttribute('cx', x); p2.setAttribute('cy', y);
+          line.setAttribute('x1', x); line.setAttribute('y1', y);
+          line.setAttribute('x2', x); line.setAttribute('y2', y);
+          bg.setAttribute('opacity', '0');
+          txt.setAttribute('opacity', '0');
+          pill.textContent = 'TAPE: CLICK END POINT ON RACK CHASSIS';
+        } else {
+          const [a, b] = rackTapePts;
+          const enc = getActiveEnclosure();
+          // Vertical scale: rack height = enc.uHeight * 1.75", Horizontal = 23.6"
+          const dyIn = (Math.abs(b.y - a.y) / rect.height) * (enc.uHeight * 1.75);
+          const dxIn = (Math.abs(b.x - a.x) / rect.width) * 23.6;
+          const spanIn = Math.hypot(dxIn, dyIn).toFixed(2);
+          const spanRu = (dyIn / 1.75).toFixed(1);
+
+          p2.setAttribute('cx', b.x); p2.setAttribute('cy', b.y);
+          line.setAttribute('x2', b.x); line.setAttribute('y2', b.y);
+
+          const midX = (a.x + b.x) / 2;
+          const midY = (a.y + b.y) / 2;
+          bg.setAttribute('x', midX - 47);
+          bg.setAttribute('y', midY - 22);
+          bg.setAttribute('opacity', '1');
+          txt.setAttribute('x', midX);
+          txt.setAttribute('y', midY - 9);
+          txt.setAttribute('opacity', '1');
+          txt.textContent = `${spanIn}" (${spanRu}U)`;
+          pill.textContent = `MEASURED RACK SPAN: ${spanIn}" (~${spanRu}U)`;
+        }
+      });
+    }
+
+    function openRackBomModal() {
+      const enc = getActiveEnclosure();
+      const sorted = [...mountedRackItems].sort((a, b) => b.startU - a.startU);
+
+      let totalU = 0, totalWt = 0, totalW = 0;
+      const rowsHtml = sorted.map(m => {
+        const hw = getHardwareById(m.hardwareId);
+        totalU += hw.uHeight;
+        totalWt += hw.weightLbs;
+        totalW += hw.wattsCont;
+        const topU = m.startU + hw.uHeight - 1;
+        const uPos = hw.uHeight > 1 ? `U${String(topU).padStart(2, '0')}–U${String(m.startU).padStart(2, '0')}` : `U${String(m.startU).padStart(2, '0')}`;
+        return `
+          <tr>
+            <td class="px-3 py-2 font-bold text-sky-300">${uPos}</td>
+            <td class="px-3 py-2 text-white">${hw.uHeight}U</td>
+            <td class="px-3 py-2 font-semibold text-white">${hw.name}</td>
+            <td class="px-3 py-2 text-amber-300">${hw.category}</td>
+            <td class="px-3 py-2 text-emerald-300">${hw.wattsCont}W</td>
+            <td class="px-3 py-2 text-sky-200">${hw.weightLbs} lbs</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('bom-table-body').innerHTML = rowsHtml || `<tr><td colspan="6" class="px-3 py-4 text-center text-sky-300">No items mounted in rack.</td></tr>`;
+
+      document.getElementById('bom-summary-strip').innerHTML = `
+        <div class="rounded border border-sky-500/30 bg-[#071021] p-2.5">
+          <div class="text-[10px] text-sky-400">ENCLOSURE</div>
+          <div class="font-bold text-white truncate">${enc.name}</div>
+        </div>
+        <div class="rounded border border-sky-500/30 bg-[#071021] p-2.5">
+          <div class="text-[10px] text-sky-400">RACK UNITS</div>
+          <div class="font-bold text-sky-300">${totalU}U Used / ${enc.uHeight}U Total</div>
+        </div>
+        <div class="rounded border border-sky-500/30 bg-[#071021] p-2.5">
+          <div class="text-[10px] text-sky-400">CONTINUOUS LOAD</div>
+          <div class="font-bold text-amber-300">${totalW} Watts</div>
+        </div>
+        <div class="rounded border border-sky-500/30 bg-[#071021] p-2.5">
+          <div class="text-[10px] text-sky-400">PAYLOAD WEIGHT</div>
+          <div class="font-bold text-emerald-300">${totalWt.toFixed(1)} lbs</div>
+        </div>
+      `;
+
+      const exportPayload = {
+        domain: 'dexterslabs.net',
+        sheet: 'SHEET-02 // POWER-HOMELAB-RACK-CONFIG',
+        enclosure: enc,
+        telemetry: { usedU: totalU, totalU: enc.uHeight, continuousWatts: totalW, payloadWeightLbs: Number(totalWt.toFixed(1)) },
+        mountedEquipment: sorted.map(m => {
+          const hw = getHardwareById(m.hardwareId);
+          return {
+            startU: m.startU,
+            endU: m.startU + hw.uHeight - 1,
+            uHeight: hw.uHeight,
+            model: hw.name,
+            category: hw.category,
+            wattsCont: hw.wattsCont,
+            weightLbs: hw.weightLbs,
+            ports: hw.ports
+          };
+        })
+      };
+
+      document.getElementById('rack-bom-json').textContent = JSON.stringify(exportPayload, null, 2);
+      document.getElementById('rack-bom-modal').classList.remove('hidden');
+    }
+
+    function closeRackBomModal() {
+      document.getElementById('rack-bom-modal').classList.add('hidden');
+    }
+
+    function copyRackBomJson() {
+      const text = document.getElementById('rack-bom-json').textContent;
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Rack elevation BOM & JSON specification copied to clipboard.');
+    }
+
+    // =========================================================================
+    // 7. TOAST HELPER & INITIALIZATION
+    // =========================================================================
+    let toastTimer = null;
+    function showToast(msg) {
+      const banner = document.getElementById('toast-banner');
+      document.getElementById('toast-msg').textContent = msg;
+      banner.classList.remove('hidden');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(hideToast, 4200);
+    }
+
+    function hideToast() {
+      document.getElementById('toast-banner').classList.add('hidden');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      selectZone('mid-demo');
+      setBlueprintLayer('demo');
+      setupBlueprintInteractions();
+      updateOverallProgress();
+
+      // Initialize Sheet 02 Rack Configurator
+      initRackConfigurator();
+      renderHardwareCatalog();
+    });
+  </script>
+</body>
+</html>
